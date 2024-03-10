@@ -1,5 +1,5 @@
 import Command from "../../abstractions/commands/Command.js";
-import { SelectableProduct } from "../../plugins/webxr/SelectHandler.js";
+import SelectableProduct from "../../plugins/webxr/handlers/select/selectables/SelectableProduct.js";
 
 /**
  * @class AddWebXRSelectableCommand

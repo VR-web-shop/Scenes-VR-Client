@@ -18,6 +18,7 @@ class View3D extends View {
      */
     constructor() {
         super()
+        this.eventDispatcher = new THREE.EventDispatcher()
     }
 
     /**
@@ -59,8 +60,29 @@ class View3D extends View {
      * @returns {void}
      */
     render() {
+        this.eventDispatcher.dispatchEvent({ type: 'beforerender' })
         View3D.resizeRendererToDisplaySize(this)
         this.renderer.render(this.scene, this.camera)
+    }
+
+    /**
+     * @function addBeforeRenderListener
+     * @description Add a listener to the render event.
+     * @param {Function} listener - The listener.
+     * @returns {void}
+     */
+    addBeforeRenderListener(listener) {
+        this.eventDispatcher.addEventListener('beforerender', listener)
+    }
+
+    /**
+     * @function removeBeforeRenderListener
+     * @description Remove a listener from the render event.
+     * @param {Function} listener - The listener.
+     * @returns {void}
+     */
+    removeBeforeRenderListener(listener) {
+        this.eventDispatcher.removeEventListener('beforerender', listener)
     }
 
     /**

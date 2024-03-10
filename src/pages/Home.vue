@@ -15,6 +15,7 @@ import RemoveOnStateChangeListener from '../shop3D/commands/events/RemoveOnState
 import AddWebXRFloorCommand from '../shop3D/commands/webxr/AddWebXRFloorCommand.js';
 import AddWebXRSelectableCommand from '../shop3D/commands/webxr/AddWebXRSelectableCommand.js';
 import AddWebXRBasketCommand from '../shop3D/commands/webxr/AddWebXRBasketCommand.js';
+import AddWebXRBasketUICommand from '../shop3D/commands/webxr/AddWebXRBasketUICommand.js';
 import AddWebXRCheckoutCommand from '../shop3D/commands/webxr/AddWebXRCheckoutCommand.js';
 import RemoveWebXRFloorCommand from '../shop3D/commands/webxr/RemoveWebXRFloorCommand.js';
 import RemoveWebXRSelectableCommand from '../shop3D/commands/webxr/RemoveWebXRSelectableCommand.js';
@@ -58,7 +59,7 @@ onMounted(async () => {
 
     await shop.invoke(new LoadPrimitiveCommand('PlaneGeometry', { width: 100, height: 100 }, material, { x: 0, y: 0, z: 0 }, { x: -Math.PI / 2, y: 0, z: 0 }, { x: 1, y: 1, z: 1 }, 'Plane'))
     await shop.invoke(new SetSceneBggCommand({ color: 0xCCCDDD }))
-    await shop.invoke(new SetCameraCommand({ x: 0, y: 3, z: 3 }, { x: -2, y: 0, z: 0 }))
+    await shop.invoke(new SetCameraCommand({ x: 0, y: 3, z: 8 }, { x: 0, y: 0, z: -10 }))
     await shop.invoke(new LoadLightCommand('DirectionalLight', 0xffffff, 3, { x: 0, y: 1, z: 0 }, 'Light'))
     await shop.invoke(new LoadMeshCommand('meshes/chair.glb', [
         { name: 'Chair_Pillow', material },
@@ -75,8 +76,9 @@ onMounted(async () => {
     await shop.invoke(new AddWebXRFloorCommand({ name: 'Plane' }))
     await shop.invoke(new AddWebXRFloorCommand({ name: 'Chair' }))
     await shop.invoke(new AddWebXRSelectableCommand({ name: 'Chair2' }))
-    await shop.invoke(new AddWebXRBasketCommand({ name: 'Basket' }))
-    await shop.invoke(new AddWebXRCheckoutCommand({ name: 'Checkout' }))
+    await shop.invoke(new AddWebXRBasketCommand({ name: 'Basket' }, { x: 0, y: -0.6, z: 0 }))
+    await shop.invoke(new AddWebXRBasketUICommand())
+    await shop.invoke(new AddWebXRCheckoutCommand({ name: 'Checkout' }, { x: 0, y: 1.3, z: 0 }, { x: 0.8, y: 0.5, z: 1.7 }))
     //await shop.invoke(new RemoveMeshCommand({ name: 'Chair' }))
     //await shop.invoke(new RemoveLightCommand({ name: 'Light' }))
     //await shop.invoke(new RemovePrimitiveCommand({ name: 'Plane' }))

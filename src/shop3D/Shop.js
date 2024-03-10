@@ -4,8 +4,10 @@ import View3D from "./View3D.js";
 import PrimitivesPlugin from "./plugins/PrimitivesPlugin.js";
 import CachesPlugin from "./plugins/CachesPlugin.js";
 import LightsPlugin from "./plugins/LightsPlugin.js";
-import WebXRPlugin from "./plugins/webxr/WebXRPlugin.js";
+
 import SearchPlugin from "./plugins/SearchPlugin.js";
+
+import WebXRPlugin from "./plugins/webxr/WebXRPlugin.js";
 
 import InitializeState from "./states/InitializeState.js";
 import ExecuteState from "./states/ExecuteState.js";
@@ -26,6 +28,7 @@ const Shop = function() {
     manager.addPlugin('search', new SearchPlugin())
     manager.addPlugin('caches', new CachesPlugin())
     manager.addPlugin('lights', new LightsPlugin())
+
     manager.addPlugin('webxr', new WebXRPlugin())
 
     /**

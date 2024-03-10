@@ -1,11 +1,68 @@
 import Plugin from "../../abstractions/plugins/Plugin.js";
 import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-import * as THREE from 'three';
 
-import TeleportHandler from './TeleportHandler.js';
-import SelectHandler from './SelectHandler.js';
-import BasketHandler from "./BasketHandler.js";
+import TeleportHandler from './handlers/teleport/TeleportHandler.js';
+import SelectHandler from './handlers/select/SelectHandler.js';
+import BasketHandler from "./handlers/basket/BasketHandler.js";
+
+/**
+ * Why handlers instead of new plugins?
+ * Because functionality such as teleport, or select 
+ * doesn't make sense without the context of WebXR.
+ */
+const handlers = {
+    teleport: new TeleportHandler(),
+    select: new SelectHandler(),
+    basket: new BasketHandler()
+}
+
+/**
+ * @function createControllers
+ * @description Create the controllers with models.
+ * @param {Object} view - The view of the shop.
+ * @returns {Array} The list of controllers.
+ */
+function createControllers(view) {
+    const xr = view.renderer.xr
+    const scene = view.scene
+    const controllers = [xr.getController(0), xr.getController(1)]
+    const modelFactory = new XRControllerModelFactory()
+    for (let i = 0; i < controllers.length; i++) {
+        const controllerModel = modelFactory.createControllerModel(controllers[i])
+
+        controllers[i].add(controllerModel);
+        scene.add(controllers[i])
+    }
+
+    return controllers
+}
+
+/**
+ * @function initXR
+ * @description Initialize WebXR.
+ * @param {Object} view - The view of the shop.
+ * @returns {void}
+ * @private
+ */
+function initXR(view) {
+    const controllers = createControllers(view)
+
+    Object.values(handlers).forEach(handler => handler.init(view, controllers))
+    view.renderer.xr.enabled = true
+}
+
+/**
+ * @function exitXR
+ * @description Dispose WebXR.
+ * @param {Object} view - The view of the shop.
+ * @returns {void}
+ * @private
+ */
+function exitXR(view) {
+    Object.values(handlers).forEach(handler => handler.exit())
+    view.renderer.xr.enabled = false
+}
 
 /**
  * @class WebXR plugin
@@ -13,9 +70,6 @@ import BasketHandler from "./BasketHandler.js";
  * @extends Plugin
  * @property {Object} view - The view of the shop.
  * @property {Object} button - The button for activating WebXR.
- * @property {Array} controllers - The list of controllers.
- * @property {Array} floor - The list of floor meshes.
- * @property {Array} selectables - The list of selectables.
  */
 class WebXRPlugin extends Plugin {
 
@@ -24,19 +78,6 @@ class WebXRPlugin extends Plugin {
      */
     constructor() {
         super()
-        this.handlers = {
-            teleport: new TeleportHandler(this),
-            select: new SelectHandler(this),
-            basket: new BasketHandler(this)
-        }
-    }
-
-    sessionStarted() {
-        Object.values(this.handlers).forEach(handler => handler.sessionStarted())
-    }
-
-    sessionEnded() {
-        Object.values(this.handlers).forEach(handler => handler.sessionEnded())
     }
 
     /**
@@ -47,31 +88,13 @@ class WebXRPlugin extends Plugin {
      */
     init(view) {
         this.view = view
-        this.view.renderer.xr.addEventListener('sessionstart', this.sessionStarted.bind(this))
-        this.view.renderer.xr.addEventListener('sessionend', this.sessionEnded.bind(this))
-        this.view.renderer.xr.enabled = true
-        this.button = VRButton.createButton(this.view.renderer)
-        this.controllers = [
-            this.view.renderer.xr.getController(0),
-            this.view.renderer.xr.getController(1)
-        ]
+        this.button = (() => {
+            const btn = VRButton.createButton(view.renderer)
+            document.body.appendChild(btn)
+            return btn
+        })()
 
-        const modelFactory = new XRControllerModelFactory()
-        for (let i = 0; i < this.controllers.length; i++) {
-            const controller = this.controllers[i]
-
-            controller.add( modelFactory.createControllerModel( controller ) );
-            controller.addEventListener('selectstart', this.handlers.teleport.start.bind(this.handlers.teleport))
-            controller.addEventListener('selectend', this.handlers.teleport.stop.bind(this.handlers.teleport))
-            controller.addEventListener('squeezestart', this.handlers.select.start.bind(this.handlers.select))
-            controller.addEventListener('squeezeend', this.handlers.select.stop.bind(this.handlers.select))
-            controller.addEventListener('squeezestart', this.handlers.basket.start.bind(this.handlers.basket))
-            controller.addEventListener('squeezeend', this.handlers.basket.stop.bind(this.handlers.basket))
-
-            this.view.scene.add(controller)
-        }
-
-        document.body.appendChild(this.button);
+        initXR(view)
     }
 
     /**
@@ -80,10 +103,11 @@ class WebXRPlugin extends Plugin {
      * @returns {void}
      */
     exit() {
-        this.view.renderer.xr.enabled = false
+        exitXR(this.view)
+        this.view = null
+
         this.button.remove()
         this.button = null
-        this.controllers = []
     }
 
     /**
@@ -93,7 +117,7 @@ class WebXRPlugin extends Plugin {
      * @returns {Object}
      */
     getHandler(name) {
-        return this.handlers[name]
+        return handlers[name]
     }
 }
 
