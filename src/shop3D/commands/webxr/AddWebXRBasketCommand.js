@@ -37,11 +37,11 @@ class AddWebXRBasketCommand extends Command {
         const selectHandler = webxrPlugin.getHandler('select')
         const basketHandler = webxrPlugin.getHandler('basket')
         const mesh = searchPlugin.search(this.search)
-        const selectable = new SelectableBasket(mesh, basketHandler)
         const offset = new THREE.Vector3(this.selectOffset.x, this.selectOffset.y, this.selectOffset.z)
+        const selectable = new SelectableBasket(mesh, offset, basketHandler)
 
         selectHandler.addSelectable(selectable)
-        basketHandler.addBasket(mesh, offset)
+        basketHandler.addBasket(selectable)
     }
 }
 

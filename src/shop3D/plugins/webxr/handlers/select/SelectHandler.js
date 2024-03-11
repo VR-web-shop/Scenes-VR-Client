@@ -36,6 +36,21 @@ function updateSelected() {
 }
 
 /**
+ * @function setSelected
+ * @description Set the selected.
+ * @param {THREE.Object3D} target - The target.
+ * @param {Selectable} selectable - The selectable.
+ * @returns {void}
+ */
+function setSelected(target, selectable) {
+    if (selected) clearSelected()
+    selected = { target, selectable }
+    selected.selectable.onSelect()
+    selectOffset.copy(target.position).sub(selectable.mesh.position)
+    _view.addBeforeRenderListener(updateSelected)
+}
+
+/**
  * @function startSelecting
  * @description Start selecting.
  * @param {Object} event - The event.
@@ -46,13 +61,7 @@ function startSelecting(event) {
     const target = event.target;
     const box = new THREE.Box3().setFromObject(target);
     const selectable = selectables.find(selectable => selectable.intersectsBox(box))
-
-    if (selectable) {
-        selected = { target, selectable }
-        selected.selectable.onSelect()
-        selectOffset.copy(target.position).sub(selectable.mesh.position)
-        _view.addBeforeRenderListener(updateSelected)
-    }
+    if (selectable) setSelected(target, selectable)
 }
 
 /**
@@ -80,6 +89,7 @@ class SelectHandler extends WebXRHandler {
      */
     constructor() {
         super()
+        Selectable.setHandler(this)
     }
 
     /**
@@ -154,6 +164,40 @@ class SelectHandler extends WebXRHandler {
                 break
             }
         }
+    }
+
+    /**
+     * @function setSelected
+     * @description Set the selected.
+     * @param {THREE.Object3D} target - The target.
+     * @param {Selectable} selectable - The selectable.
+     * @returns {void}
+     */
+    setSelected(target, selectable) {
+        if (!(target instanceof THREE.Object3D)) {
+            throw new Error('The target must be an instance of THREE.Object3D')
+        }
+
+        if (!(selectable instanceof Selectable)) {
+            throw new Error('The selectable is not an instance of Selectable')
+        }
+
+        selectable.mesh.position.copy(target.position)
+        
+        setSelected(target, selectable)
+    }
+
+    /**
+     * @function clearSelected
+     * @description Clear the selected.
+     * @returns {void}
+     */
+    isSelected(selectable) {
+        if (!(selectable instanceof Selectable)) {
+            throw new Error('The selectable is not an instance of Selectable')
+        }
+
+        return selected && selected.selectable === selectable
     }
 }
 

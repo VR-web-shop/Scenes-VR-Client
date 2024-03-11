@@ -15,7 +15,7 @@ const SpatialUIBuilder = function() {
     const texts = [];
     const buttons = [];
 
-    this.addPanel = function(width, height, color, name) {
+    this.addPanel = function(width, height, color, name='panel') {
         const panel = new SpatialUIPanel(width, height, color);
         panel.setName(name);
         container.addElement(panel);
@@ -23,7 +23,7 @@ const SpatialUIBuilder = function() {
         return this;
     }
 
-    this.addGrid = function(columns, rows, rowSpacing, columnSpacing, name) {
+    this.addGrid = function(columns, rows, rowSpacing, columnSpacing, name='grid') {
         const grid = new SpatialUIGrid(columns, rows, rowSpacing, columnSpacing);
         grid.setName(name);
         container.addElement(grid);
@@ -31,7 +31,7 @@ const SpatialUIBuilder = function() {
         return this;
     }
 
-    this.addImage = async function(src, width, height, name) {
+    this.addImage = async function(src, width, height, name='image') {
         const texture = await SpatialUIImage.loadTexture(src);
         const image = new SpatialUIImage(texture, width, height);
         image.setName(name);
@@ -40,7 +40,7 @@ const SpatialUIBuilder = function() {
         return this;
     }
 
-    this.addText = function(text, textOptions, color, name) {
+    this.addText = function(text, textOptions, color, name='text') {
         const textElement = new SpatialUIText(text, textOptions, color);
         textElement.setName(name);
         container.addElement(textElement);
@@ -48,7 +48,7 @@ const SpatialUIBuilder = function() {
         return this;
     }
 
-    this.addButton = function(width, height, color, hoverColor, text, textOptions, textColor, name) {
+    this.addButton = function(width, height, color, hoverColor, text, textOptions, textColor, name='button') {
         const spatialUIText = new SpatialUIText(text, textOptions, textColor);
         const button = new SpatialUIButton(width, height, color, hoverColor, spatialUIText);
         button.setName(name);

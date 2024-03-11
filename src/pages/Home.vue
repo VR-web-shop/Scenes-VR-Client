@@ -15,7 +15,6 @@ import RemoveOnStateChangeListener from '../shop3D/commands/events/RemoveOnState
 import AddWebXRFloorCommand from '../shop3D/commands/webxr/AddWebXRFloorCommand.js';
 import AddWebXRSelectableCommand from '../shop3D/commands/webxr/AddWebXRSelectableCommand.js';
 import AddWebXRBasketCommand from '../shop3D/commands/webxr/AddWebXRBasketCommand.js';
-import AddWebXRBasketUICommand from '../shop3D/commands/webxr/AddWebXRBasketUICommand.js';
 import AddWebXRCheckoutCommand from '../shop3D/commands/webxr/AddWebXRCheckoutCommand.js';
 import RemoveWebXRFloorCommand from '../shop3D/commands/webxr/RemoveWebXRFloorCommand.js';
 import RemoveWebXRSelectableCommand from '../shop3D/commands/webxr/RemoveWebXRSelectableCommand.js';
@@ -77,7 +76,6 @@ onMounted(async () => {
     await shop.invoke(new AddWebXRFloorCommand({ name: 'Chair' }))
     await shop.invoke(new AddWebXRSelectableCommand({ name: 'Chair2' }))
     await shop.invoke(new AddWebXRBasketCommand({ name: 'Basket' }, { x: 0, y: -0.6, z: 0 }))
-    await shop.invoke(new AddWebXRBasketUICommand())
     await shop.invoke(new AddWebXRCheckoutCommand({ name: 'Checkout' }, { x: 0, y: 1.3, z: 0 }, { x: 0.8, y: 0.5, z: 1.7 }))
     //await shop.invoke(new RemoveMeshCommand({ name: 'Chair' }))
     //await shop.invoke(new RemoveLightCommand({ name: 'Light' }))

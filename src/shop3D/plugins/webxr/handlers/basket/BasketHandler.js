@@ -61,7 +61,7 @@ function grapBasket(event) {
     const target = event.target;
     const box = new THREE.Box3().setFromObject(target);
     if (selectPoint.intersectsBox(box)) {
-        basket.grap(target)
+        basket.grap(target, _view)
     }
 }
 
@@ -83,7 +83,7 @@ function releaseBasket() {
         }
     }
 
-    basket.release()
+    basket.release(_view)
 }
 
 /**
@@ -93,7 +93,7 @@ function releaseBasket() {
  */
 function clearBasket() {
     basket.release()
-    basket.removeMesh()
+    basket.removeSelectable()
 }
 
 /**
@@ -131,6 +131,8 @@ class BasketHandler extends WebXRHandler {
             controller.addEventListener('squeezestart', grapBasket)
             controller.addEventListener('squeezeend', releaseBasket)
         }
+
+        basket.setupUI(view.scene);
     }
 
     /**
@@ -192,23 +194,11 @@ class BasketHandler extends WebXRHandler {
     /**
      * @function addBasket
      * @description Add a basket.
-     * @param {Object} object3D - The object.
-     * @param {THREE.Vector3} selectOffset - The select offset.
+     * @param {Object} selectableBasket - The object.
      * @returns {void}
-     * @throws {Error} The object must be an instance of THREE.Object3D.
-     * @throws {Error} The select offset must be an instance of THREE.Vector3.
      */
-    addBasket (object3D, selectOffset = new THREE.Vector3(0, 0, 0)) {
-        if (!(object3D instanceof THREE.Object3D)) {
-            throw new Error('The object must be an instance of THREE.Object3D')
-        }
-
-        if (!selectOffset instanceof THREE.Vector3) {
-            throw new Error('The select offset must be an instance of THREE.Vector3')
-        }
-
-        basket.addMesh(object3D);
-        basket.setOffset(selectOffset);
+    addBasket (selectableBasket) {
+        basket.addSelectable(selectableBasket);
     }
 
     /**
@@ -217,7 +207,7 @@ class BasketHandler extends WebXRHandler {
      * @returns {Object} The basket.
      */
     getBasket () {
-        return basket.getMesh();
+        return basket.getSelectable();
     }
 
     /**
@@ -226,11 +216,11 @@ class BasketHandler extends WebXRHandler {
      * @returns {void}
      */
     removeBasket () {
-        basket.removeMesh();
+        basket.removeSelectable();
     }
 
-    addBasketUI (ui) {
-        basket.addUI(ui);
+    async setupBasketUI (scene) {
+        await basket.setupUI(scene);
     }
 }
 
