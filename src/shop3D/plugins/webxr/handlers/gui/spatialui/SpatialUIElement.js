@@ -12,7 +12,7 @@ import * as THREE from 'three';
  * @property {Function} add - Add an object to the spatial UI.
  * @property {Function} remove - Remove an object from the spatial UI.
  */
-class SpatialUIElement {
+export default class SpatialUIElement {
     /**
      * @constructor
      * @param {THREE.Object3D} object3D - The object.
@@ -49,11 +49,7 @@ class SpatialUIElement {
      * @throws {Error} The rotation must be an instance of THREE.Quaternion.
      */
     setRotation(rotation) {
-        if (!(rotation instanceof THREE.Quaternion)) {
-            throw new Error('The rotation must be an instance of THREE.Quaternion');
-        }
-
-        this.object3D.setRotationFromQuaternion(rotation);
+        this.object3D.rotation.copy(rotation);
     }
 
     /**
@@ -113,8 +109,9 @@ class SpatialUIElement {
         if (!(spatialUIElement instanceof SpatialUIElement)) {
             throw new Error('The spatialUIElement must be an instance of SpatialUIElement');
         }
-
+        
         this.object3D.remove(spatialUIElement.object3D);
+        
         const index = this.children.indexOf(spatialUIElement);
         if (index > -1) {
             this.children.splice(index, 1);
@@ -128,7 +125,7 @@ class SpatialUIElement {
      */
     clearChildren() {
         for (let i = 0; i < this.children.length; i++) {
-            this.removeElement(this.children[i]);
+            this.object3D.remove(this.children[i].object3D);
         }
 
         this.children.length = 0;
@@ -155,6 +152,49 @@ class SpatialUIElement {
 
         this.clearChildren();
         this.children = elements;
+        this.children.forEach((element) => {
+            this.object3D.add(element.object3D);
+        });
+    }
+
+    /**
+     * @function findAllChildren
+     * @description Find all the children and their children of the spatial UI element.
+     * @returns {Array} The children.
+     */
+    findAllChildren() {
+        const findAllChildren = (obj, arr) => {
+            arr.push(obj)
+
+            if (obj.children.length > 0) {
+                for (let i = 0; i < obj.children.length; i++) {
+                    findAllChildren(obj.children[i], arr)
+                }
+            }
+        }
+        const children = []
+        findAllChildren(this, children)
+
+        return children
+    }
+
+    /**
+     * @function isParentVisible
+     * @description Check if the parent is visible.
+     * @returns {boolean} The result.
+     */
+    isParentVisible() {
+        // Continue to check until a parent is not visible or the root is reached.
+        let parent = this.object3D
+        while (parent) {
+            if (!parent.visible) {
+                return false
+            }
+
+            parent = parent.parent
+        }
+
+        return true
     }
 
     /**
@@ -169,10 +209,31 @@ class SpatialUIElement {
             }
 
             if (object3D.material) {
-                object3D.material.dispose();
+                //object3D.material.dispose();
             }
         });
     }
 }
 
-export default SpatialUIElement
+/**
+ * @class SelectableSpatialUIElement
+ * @classdesc An extension of the spatial UI element that signifies it is selectable.
+ */
+export class SelectableSpatialUIElement extends SpatialUIElement {
+    constructor(object3D) {
+        super(object3D);
+    }
+
+    isActive() {
+        return this.object3D.visible && this.isParentVisible()
+    }
+
+    click() {
+    }
+
+    onPointerOver() {
+    }
+
+    onPointerOut() {
+    }
+}

@@ -5,6 +5,7 @@ import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFa
 import TeleportHandler from './handlers/teleport/TeleportHandler.js';
 import SelectHandler from './handlers/select/SelectHandler.js';
 import BasketHandler from "./handlers/basket/BasketHandler.js";
+import GUIHandler from "./handlers/gui/GUIHandler.js";
 
 /**
  * Why handlers instead of new plugins?
@@ -14,7 +15,8 @@ import BasketHandler from "./handlers/basket/BasketHandler.js";
 const handlers = {
     teleport: new TeleportHandler(),
     select: new SelectHandler(),
-    basket: new BasketHandler()
+    basket: new BasketHandler(),
+    gui: new GUIHandler()
 }
 
 /**

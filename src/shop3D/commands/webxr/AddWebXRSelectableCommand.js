@@ -1,5 +1,6 @@
 import Command from "../../abstractions/commands/Command.js";
 import SelectableProduct from "../../plugins/webxr/handlers/select/selectables/SelectableProduct.js";
+import AddSelectableCommand from "../../plugins/webxr/handlers/select/commands/AddSelectableCommand.js";
 
 /**
  * @class AddWebXRSelectableCommand
@@ -29,9 +30,13 @@ class AddWebXRSelectableCommand extends Command {
      * @returns {void}
      */
     async execute(options) {
-        const mesh = options.plugins.find('search').search(this.search)
+        const searchPlugin = options.plugins.find('search')
+        const webxrPlugin = options.plugins.find('webxr')
+        const selectHandler = webxrPlugin.getHandler('select')
+        const mesh = searchPlugin.search(this.search)
         const selectable = new SelectableProduct(mesh)
-        options.plugins.find('webxr').getHandler('select').addSelectable(selectable)
+
+        await selectHandler.invoke(new AddSelectableCommand(selectable))
     }
 }
 

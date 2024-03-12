@@ -1,5 +1,5 @@
 import Command from "../../abstractions/commands/Command.js";
-import CachesPlugin from "../../plugins/CachesPlugin.js";
+import RemoveSelectableCommand from "../../plugins/webxr/handlers/select/commands/RemoveSelectableCommand.js";
 
 /**
  * @class RemoveWebXRSelectableCommand
@@ -29,8 +29,12 @@ class RemoveWebXRSelectableCommand extends Command {
      * @returns {void}
      */
     async execute(options) {
-        const mesh = options.plugins.find('search').search(this.search)
-        options.plugins.find('webxr').getHandler('select').removeSelectable(mesh)
+        const searchPlugin = options.plugins.find('search')
+        const webxrPlugin = options.plugins.find('webxr')
+        const selectHandler = webxrPlugin.getHandler('select')
+        const mesh = searchPlugin.search(this.search)
+        
+        await selectHandler.invoke(new RemoveSelectableCommand(mesh))
     }
 }
 

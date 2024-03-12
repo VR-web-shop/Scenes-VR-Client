@@ -1,4 +1,10 @@
 import Command from "../../abstractions/commands/Command.js";
+import FindUIObjectByName from "../../plugins/webxr/handlers/gui/commands/FindUIObjectByName.js";
+import RemoveUIObjectCommand from "../../plugins/webxr/handlers/gui/commands/RemoveUIObjectCommand.js";
+import RemoveSelectableCommand from "../../plugins/webxr/handlers/select/commands/RemoveSelectableCommand.js";
+import RemoveBasketSelectableCommand from "../../plugins/webxr/handlers/basket/commands/RemoveBasketSelectableCommand.js";
+import GetBasketSelectableCommand from "../../plugins/webxr/handlers/basket/commands/GetBasketSelectableCommand.js";
+import SetBasketUIInterfaceCommand from "../../plugins/webxr/handlers/basket/commands/SetBasketUIInterfaceCommand.js";
 
 /**
  * @class RemoveWebXRBasketCommand
@@ -25,10 +31,18 @@ class RemoveWebXRBasketCommand extends Command {
         const webxrPlugin = options.plugins.find('webxr')
         const selectHandler = webxrPlugin.getHandler('select')
         const basketHandler = webxrPlugin.getHandler('basket')
-        const basket = basketHandler.getBasket()
+        const guiHandler = webxrPlugin.getHandler('gui')
+        
+        const basket = await basketHandler.invoke(new GetBasketSelectableCommand())
+        const basketUIContainer = await guiHandler.invoke(new FindUIObjectByName('basket'))
+        
+        if (basketUIContainer) {
+            await guiHandler.invoke(new RemoveUIObjectCommand(basketUIContainer))
+            await basketHandler.invoke(new SetBasketUIInterfaceCommand(null))
+        }
 
-        selectHandler.removeSelectable(basket)
-        basketHandler.removeBasket()
+        await selectHandler.invoke(new RemoveSelectableCommand(basket))
+        await basketHandler.invoke(new RemoveBasketSelectableCommand())
     }
 }
 

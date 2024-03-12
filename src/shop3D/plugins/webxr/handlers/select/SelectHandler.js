@@ -1,4 +1,4 @@
-import WebXRHandler from '../../WebXRHandler.js'
+import WebXRHandler from '../../abstractions/WebXRHandler.js'
 import Selectable from './Selectable.js'
 import * as THREE from 'three'
 
@@ -70,7 +70,7 @@ function startSelecting(event) {
  * @returns {void}
  * @private
  */
-function clearSelected() {
+function clearSelected(event) {
     if (selected) {
         _view.removeBeforeRenderListener(updateSelected)
         selected.selectable.onDeselect()
@@ -112,6 +112,8 @@ class SelectHandler extends WebXRHandler {
             controller.addEventListener('squeezestart', startSelecting)
             controller.addEventListener('squeezeend', clearSelected)
         }
+
+        this.initInvoker({ selectables, setSelected })
     }
 
     /**
@@ -131,73 +133,6 @@ class SelectHandler extends WebXRHandler {
             controller.removeEventListener('squeezestart', startSelecting)
             controller.removeEventListener('squeezeend', clearSelected)
         }
-    }
-
-    /**
-     * @function addSelectable
-     * @description Add a selectable.
-     * @param {Selectable} selectable - The selectable.
-     * @returns {void}
-     */
-    addSelectable(selectable) {
-        if (!(selectable instanceof Selectable)) {
-            throw new Error('The selectable is not an instance of Selectable')
-        }
-
-        selectables.push(selectable);
-    }
-
-    /**
-     * @function removeSelectable
-     * @description Remove a selectable.
-     * @param {THREE.Object3D} object3D - The object.
-     * @returns {void}
-     */
-    removeSelectable(object3D) {
-        if (!(object3D instanceof THREE.Object3D)) {
-            throw new Error('The object must be an instance of THREE.Object3D')
-        }
-
-        for (let i = 0; i < selectables.length; i++) {
-            if (selectables[i].mesh.uuid === object3D.uuid) {
-                selectables.splice(i, 1)
-                break
-            }
-        }
-    }
-
-    /**
-     * @function setSelected
-     * @description Set the selected.
-     * @param {THREE.Object3D} target - The target.
-     * @param {Selectable} selectable - The selectable.
-     * @returns {void}
-     */
-    setSelected(target, selectable) {
-        if (!(target instanceof THREE.Object3D)) {
-            throw new Error('The target must be an instance of THREE.Object3D')
-        }
-
-        if (!(selectable instanceof Selectable)) {
-            throw new Error('The selectable is not an instance of Selectable')
-        }
-
-        selectable.mesh.position.copy(target.position)
-        
-        setSelected(target, selectable)
-    }
-
-    /**
-     * @function clearSelected
-     * @description Clear the selected.
-     * @returns {void}
-     */
-    isSelected(selectable) {
-        if (!(selectable instanceof Selectable)) {
-            throw new Error('The selectable is not an instance of Selectable')
-        }
-
-        return selected && selected.selectable === selectable
     }
 }
 

@@ -1,4 +1,4 @@
-import SpatialUIElement from "../SpatialUIElement.js";
+import { SelectableSpatialUIElement } from "../SpatialUIElement.js";
 import * as THREE from 'three';
 
 /**
@@ -6,7 +6,7 @@ import * as THREE from 'three';
  * @classdesc A simple flat colored panel.
  * @extends SpatialUIElement
  */
-class SpatialUIPanel extends SpatialUIElement {
+class SpatialUIPanel extends SelectableSpatialUIElement {
     /**
      * @constructor
      * @param {number} width - The width.

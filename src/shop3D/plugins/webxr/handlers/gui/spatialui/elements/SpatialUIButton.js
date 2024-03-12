@@ -1,18 +1,19 @@
-import SpatialUIElement from "../SpatialUIElement.js";
+import { SelectableSpatialUIElement } from "../SpatialUIElement.js";
 import SpatialUIText from "./SpatialUIText.js";
 import * as THREE from 'three';
 
 /**
  * @class SpatialUIButton
  * @classdesc A simple flat colored button.
- * @extends SpatialUIElement
+ * @extends SelectableSpatialUIElement
  */
-class SpatialUIButton extends SpatialUIElement {
+class SpatialUIButton extends SelectableSpatialUIElement {
     /**
      * @constructor
      * @param {number} width - The width.
      * @param {number} height - The height.
      * @param {string} color - The color.
+     * @param {string} hoverColor - The hover color.
      * @param {SpatialUIText} spatialUIText - The spatial UI text.
      */
     constructor(width, height, color, hoverColor, spatialUIText) {
@@ -50,13 +51,14 @@ class SpatialUIButton extends SpatialUIElement {
 
     click() {
         this.eventDispatcher.dispatchEvent({ type: 'click' });
+        this.object3D.material.color.set(this.color);
     }
 
-    showHover() {
+    onPointerOver() {
         this.object3D.material.color.set(this.hoverColor);
     }
 
-    hideHover() {
+    onPointerOut() {
         this.object3D.material.color.set(this.color);
     }
 

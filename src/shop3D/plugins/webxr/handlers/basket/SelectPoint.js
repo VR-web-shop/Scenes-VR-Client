@@ -31,7 +31,13 @@ function SelectPoint(view, offset = new THREE.Vector3(0, 0, 0)) {
         cube.visible = visible
     }
 
-    this.updatePosition = function () {
+    this.intersectsBox = function (box) {
+        const point = new THREE.Vector3()
+        cube.getWorldPosition(point)
+        return box.containsPoint(point)
+    }
+
+    const updatePosition = function () {
         const xr = view.renderer.xr
         if (xr.isPresenting) {
             const camera = xr.getCamera()
@@ -41,28 +47,12 @@ function SelectPoint(view, offset = new THREE.Vector3(0, 0, 0)) {
         }
     }
 
-    this.intersectsBox = function (box) {
-        const point = new THREE.Vector3()
-        cube.getWorldPosition(point)
-        return box.containsPoint(point)
-    }
-
     this.followVRPlayer = function () {
-        if (interval) {
-            clearInterval(interval)
-            interval = null
-        }
-
-        interval = setInterval(() => {
-            this.updatePosition()
-        }, 1000 / 60)
+        view.addBeforeRenderListener(updatePosition)
     }
 
     this.stopFollowVRPlayer = function () {
-        if (interval) {
-            clearInterval(interval)
-            interval = null
-        }
+        view.removeBeforeRenderListener(updatePosition)
     }
 }
 

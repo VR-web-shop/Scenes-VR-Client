@@ -1,5 +1,5 @@
-import WebXRHandler from '../../WebXRHandler.js';
-import Teleporter from './Teleporter.js';
+import WebXRHandler from '../../abstractions/WebXRHandler.js';
+import Pointer from '../../pointers/Pointer.js';
 import * as THREE from 'three';
 
 /**
@@ -15,10 +15,10 @@ const floor = []
 let _view = null
 
 /**
- * @property {Object} teleporter - The teleporter.
+ * @property {Object} pointer - The pointer.
  * @private
  */
-let teleporter = null
+let pointer = null
 
 /**
  * @function startTeleporting
@@ -28,9 +28,9 @@ let teleporter = null
  * @private
  */
 function startTeleporting(event) {
-    if (teleporter) return
+    if (pointer) return
 
-    teleporter = new Teleporter(event.target, _view, () => floor)
+    pointer = new Pointer(event.target, _view, () => floor)
 }
 
 /**
@@ -41,21 +41,40 @@ function startTeleporting(event) {
  * @private
  */
 function endTeleporting(event) {
-    teleporter.teleport()
-    clearTeleporter()
+    const point = pointer.getPosition()
+    clearPointer()
+
+    // Teleport the user to the point.
+    const xr = _view.renderer.xr
+    const baseReferenceSpace = xr.getReferenceSpace()
+    const offsetPosition = { x: - point.x, y: - point.y, z: - point.z, w: 1 };
+    const offsetRotation = new THREE.Quaternion();
+    const transform = new XRRigidTransform(offsetPosition, offsetRotation);
+    const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace(transform);
+    xr.setReferenceSpace(teleportSpaceOffset);
 }
 
 /**
- * @function clearTeleporter
- * @description Clear the teleporter.
+ * @function clearPointer
+ * @description Clear the pointer.
  * @returns {void}
  * @private
  */
-function clearTeleporter() {
-    if (teleporter) {
-        teleporter.destroy()
-        teleporter = null
+function clearPointer() {
+    if (pointer) {
+        pointer.dispose()
+        pointer = null
     }
+}
+
+/**
+ * @function clearFloor
+ * @description Clear the floor.
+ * @returns {void}
+ * @private
+ */
+function clearFloor() {
+    floor.length = 0
 }
 
 /**
@@ -72,7 +91,7 @@ class TeleportHandler extends WebXRHandler {
         this.controllers = controllers
 
         // Note: If the xr session is ended, remove the teleporter.
-        view.renderer.xr.addEventListener('sessionend', clearTeleporter)
+        view.renderer.xr.addEventListener('sessionend', clearPointer)
 
         for (let i = 0; i < controllers.length; i++) {
             const controller = controllers[i]
@@ -80,13 +99,15 @@ class TeleportHandler extends WebXRHandler {
             controller.addEventListener('selectstart', startTeleporting)
             controller.addEventListener('selectend', endTeleporting)
         }
+
+        this.initInvoker({ floor })
     }
 
     exit() {
-        floor.length = 0
-        clearTeleporter()
+        clearFloor()
+        clearPointer()
 
-        _view.renderer.xr.removeEventListener('sessionend', clearTeleporter)
+        _view.renderer.xr.removeEventListener('sessionend', clearPointer)
 
         for (let i = 0; i < this.controllers.length; i++) {
             const controller = this.controllers[i]
@@ -94,34 +115,6 @@ class TeleportHandler extends WebXRHandler {
             controller.removeEventListener('selectstart', startTeleporting)
             controller.removeEventListener('selectend', endTeleporting)
         }
-    }
-
-    addFloor = function(object3D) {
-        if (!(object3D instanceof THREE.Object3D)) {
-            throw new Error('The object must be an instance of THREE.Object3D')
-        }
-
-        const floorObject = floor.find(floor => floor.uuid === object3D.uuid)
-        if (floorObject) {
-            throw new Error('The floor already exists')
-        }
-
-        floor.push(object3D)
-    }
-
-    removeFloor = function(object3D) {
-        if (!(object3D instanceof THREE.Object3D)) {
-            throw new Error('The object must be an instance of THREE.Object3D')
-        }
-
-        const floorObject = floor.find(floor => floor.uuid === object3D.uuid)
-        if (!floorObject) {
-            throw new Error('The floor does not exist')
-        }
-
-        
-        const index = floor.indexOf(floorObject)
-        floor.splice(index, 1)
     }
 }
 

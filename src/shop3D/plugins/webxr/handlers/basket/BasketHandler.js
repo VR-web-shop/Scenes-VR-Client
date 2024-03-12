@@ -1,6 +1,5 @@
-import WebXRHandler from '../../WebXRHandler.js'
+import WebXRHandler from '../../abstractions/WebXRHandler.js'
 import Basket from './Basket.js';
-import Checkout from './Checkout.js';
 import SelectPoint from './SelectPoint.js';
 import * as THREE from 'three'
 
@@ -70,7 +69,11 @@ function grapBasket(event) {
  * @description Release the basket.
  * @returns {void}
  */
-function releaseBasket() {
+function releaseBasket(event) {
+    if (event.target !== basket.getSelected()) {
+        return
+    }
+    console.log('releaseBasket')
     // Check if the basket is selected
     if (basket.hasSelected()) {
         // Check if one of the checkouts collides with the basket
@@ -94,6 +97,15 @@ function releaseBasket() {
 function clearBasket() {
     basket.release()
     basket.removeSelectable()
+}
+
+/**
+ * @function clearCheckouts
+ * @description Clear the checkouts.
+ * @returns {void}
+ */
+function clearCheckouts() {
+    checkouts.length = 0
 }
 
 /**
@@ -132,7 +144,7 @@ class BasketHandler extends WebXRHandler {
             controller.addEventListener('squeezeend', releaseBasket)
         }
 
-        basket.setupUI(view.scene);
+        this.initInvoker({ basket, checkouts })
     }
 
     /**
@@ -141,7 +153,7 @@ class BasketHandler extends WebXRHandler {
      * @returns {void}
      */
     exit() {
-        checkouts.length = 0
+        clearCheckouts()
         clearBasketSelectPoint()
         clearBasket()
 
@@ -155,72 +167,6 @@ class BasketHandler extends WebXRHandler {
             controller.removeEventListener('squeezestart', grapBasket)
             controller.removeEventListener('squeezeend', releaseBasket)
         }
-    }
-
-    /**
-     * @function addCheckout
-     * @description Add a checkout.
-     * @param {Object} object3D - The object.
-     * @param {THREE.Vector3} surfaceOffset - The surface offset.
-     * @param {THREE.Vector3} surfaceSize - The surface size.
-     * @returns {void}
-     */
-    addCheckout (object3D, surfaceOffset, surfaceSize) {
-        if (!(object3D instanceof THREE.Object3D)) {
-            throw new Error('The object must be an instance of THREE.Object3D')
-        }
-
-        checkouts.push(new Checkout(object3D, surfaceOffset, surfaceSize));
-    }
-
-    /**
-     * @function removeCheckout
-     * @description Remove a checkout.
-     * @param {Object} object3D - The object.
-     * @returns {void}
-     * @throws {Error} The object must be an instance of THREE.Object3D.
-     */
-    removeCheckout (object3D) {
-        if (!(object3D instanceof THREE.Object3D)) {
-            throw new Error('The object must be an instance of THREE.Object3D')
-        }
-
-        const index = checkouts.findIndex(checkout => checkout.mesh === object3D);
-        if (index !== -1) {
-            checkouts.splice(index, 1);
-        }
-    }
-
-    /**
-     * @function addBasket
-     * @description Add a basket.
-     * @param {Object} selectableBasket - The object.
-     * @returns {void}
-     */
-    addBasket (selectableBasket) {
-        basket.addSelectable(selectableBasket);
-    }
-
-    /**
-     * @function getBasket
-     * @description Get the basket.
-     * @returns {Object} The basket.
-     */
-    getBasket () {
-        return basket.getSelectable();
-    }
-
-    /**
-     * @function removeBasket
-     * @description Remove the basket.
-     * @returns {void}
-     */
-    removeBasket () {
-        basket.removeSelectable();
-    }
-
-    async setupBasketUI (scene) {
-        await basket.setupUI(scene);
     }
 }
 

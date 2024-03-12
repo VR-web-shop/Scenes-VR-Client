@@ -35,6 +35,7 @@ class SpatialUIText extends SpatialUIElement {
             ]
         ));
 
+        this.text = text;
         this.textOptions = textOptions;
         this.color = color;
     }

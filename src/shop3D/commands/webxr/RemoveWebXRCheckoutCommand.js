@@ -1,4 +1,5 @@
 import Command from "../../abstractions/commands/Command.js";
+import RemoveCheckoutCommand from "../../plugins/webxr/handlers/basket/commands/RemoveCheckoutCommand.js";
 
 /**
  * @class RemoveWebXRCheckoutCommand
@@ -28,14 +29,12 @@ class RemoveWebXRCheckoutCommand extends Command {
      * @returns {void}
      */
     async execute(options) {
-        const mesh = options.plugins
-            .find('search')
-            .search(this.search)
+        const searchPlugin = options.plugins.find('search')
+        const webxrPlugin = options.plugins.find('webxr')
+        const basketHandler = webxrPlugin.getHandler('basket')
+        const mesh = searchPlugin.search(this.search)
         
-        options.plugins
-            .find('webxr')
-            .getHandler('basket')
-            .removeCheckout(mesh)
+        await basketHandler.invoke(new RemoveCheckoutCommand(mesh))
     }
 }
 

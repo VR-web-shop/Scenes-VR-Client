@@ -62,21 +62,24 @@ onMounted(async () => {
     await shop.invoke(new LoadLightCommand('DirectionalLight', 0xffffff, 3, { x: 0, y: 1, z: 0 }, 'Light'))
     await shop.invoke(new LoadMeshCommand('meshes/chair.glb', [
         { name: 'Chair_Pillow', material },
-    ], { x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }, { x: 1, y: 1, z: 1 }, 'Chair'))
+    ], { x: 7, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }, { x: 1, y: 1, z: 1 }, 'Chair'))
     await shop.invoke(new LoadMeshCommand('meshes/chair.glb', [
         { name: 'Chair_Pillow', material },
-    ], { x: 2, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }, { x: 1, y: 1, z: 1 }, 'Chair2'))
+    ], { x: 6, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }, { x: 1, y: 1, z: 1 }, 'Chair2'))
     await shop.invoke(new LoadMeshCommand('meshes/basket.glb', [
         { name: 'Basket', material },
     ], { x: -1.4, y: 1.8, z: -4 }, { x: 0, y: Math.PI / 2, z: 0 }, { x: 1, y: 1, z: 1 }, 'Basket'))
     await shop.invoke(new LoadMeshCommand('meshes/checkout.glb', [
         { name: 'Checkout', material },
-    ], { x: 0, y: 1, z: -5 }, { x: 0, y: -Math.PI / 2, z: 0 }, { x: 1, y: 1, z: 1 }, 'Checkout'))
+    ], { x: 3, y: 1, z: -5 }, { x: 0, y: -Math.PI / 2, z: 0 }, { x: 1, y: 1, z: 1 }, 'Checkout'))
+    await shop.invoke(new LoadMeshCommand('meshes/basket_placeholder.glb', [
+        { name: 'Basket_Placeholder', material },
+    ], { x: 0, y: 0, z: 0 }, { x: 0, y: -Math.PI / 2, z: 0 }, { x: 1, y: 1, z: 1 }, 'Basket_Placeholder'))
     await shop.invoke(new AddWebXRFloorCommand({ name: 'Plane' }))
     await shop.invoke(new AddWebXRFloorCommand({ name: 'Chair' }))
     await shop.invoke(new AddWebXRSelectableCommand({ name: 'Chair2' }))
-    await shop.invoke(new AddWebXRBasketCommand({ name: 'Basket' }, { x: 0, y: -0.6, z: 0 }))
-    await shop.invoke(new AddWebXRCheckoutCommand({ name: 'Checkout' }, { x: 0, y: 1.3, z: 0 }, { x: 0.8, y: 0.5, z: 1.7 }))
+    await shop.invoke(new AddWebXRBasketCommand({ name: 'Basket' }, { name: 'Basket_Placeholder' }, { x: 0, y: -0.6, z: 0 }, { x: 0, y: 0, z: 0 }))
+    await shop.invoke(new AddWebXRCheckoutCommand({ name: 'Checkout' }, { x: 0, y: 1.3, z: 0 }, { x: 0.8, y: 0.5, z: 1.7 }, { x: 0, y: 3, z: 0 }, { x: 0, y: 0, z: 0 }))
     //await shop.invoke(new RemoveMeshCommand({ name: 'Chair' }))
     //await shop.invoke(new RemoveLightCommand({ name: 'Light' }))
     //await shop.invoke(new RemovePrimitiveCommand({ name: 'Plane' }))

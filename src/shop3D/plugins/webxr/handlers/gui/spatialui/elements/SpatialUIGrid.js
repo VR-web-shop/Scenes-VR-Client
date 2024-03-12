@@ -30,8 +30,6 @@ class SpatialUIGrid extends SpatialUIElement {
      */
     arrangeElements() {
         let elementIndex = 0;
-        const startX = this.object3D.position.x;
-        const startY = this.object3D.position.y;
 
         for (let i = this.rows - 1; i >= 0; i--) {
             for (let j = 0; j < this.columns; j++) {
@@ -40,9 +38,9 @@ class SpatialUIGrid extends SpatialUIElement {
                 }
 
                 const element = this.children[elementIndex];
-                const x = (j - this.columns / 2) * this.columnSpacing + startX;
-                const y = (i - this.rows / 2) * this.rowSpacing + startY;
-
+                const x = (j - this.columns / 2) * this.columnSpacing;
+                const y = (i - this.rows / 2) * this.rowSpacing;
+                
                 element.setPosition(new THREE.Vector3(x, y, 0));
                 elementIndex++;
             }
@@ -86,7 +84,7 @@ class SpatialUIGrid extends SpatialUIElement {
         if (elements.length > this.columns * this.rows) {
             throw new Error('The number of elements must be less than or equal to the number of rows times the number of columns');
         }
-
+        
         super.setElements(elements);
     }
 

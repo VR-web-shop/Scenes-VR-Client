@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+import SetSelectedCommand from './commands/SetSelectedCommand.js'
+import IsSelectedCommand from './commands/IsSelectedCommand.js'
 
 let _handler = null
 
@@ -25,12 +27,13 @@ class Selectable {
     onSelect() { }
     onDeselect() { }
 
-    isSelected() {
-        return _handler.isSelected(this)
+    async isSelected() {
+        console.log('Selectable isSelected')
+        return await _handler.invoke(new IsSelectedCommand(this))
     }
 
-    select(controller) {
-        _handler.setSelected(controller, this)
+    async select(controller) {
+        await _handler.invoke(new SetSelectedCommand(controller, this))
     }
 
     static setHandler(handler) {

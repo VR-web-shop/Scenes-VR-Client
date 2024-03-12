@@ -1,5 +1,5 @@
 import Command from "../../abstractions/commands/Command.js";
-import CachesPlugin from "../../plugins/CachesPlugin.js";
+import RemoveFloorCommand from "../../plugins/webxr/handlers/teleport/commands/RemoveFloorCommand.js";
 
 /**
  * @class RemoveWebXRFloorCommand
@@ -29,8 +29,12 @@ class RemoveWebXRFloorCommand extends Command {
      * @returns {void}
      */
     async execute(options) {
-        const mesh = options.plugins.find('search').search(this.search)
-        options.plugins.find('webxr').getHandler('teleport').removeFloor(mesh)
+        const searchPlugin = options.plugins.find('search')
+        const webxrPlugin = options.plugins.find('webxr')
+        const teleportHandler = webxrPlugin.getHandler('teleport')
+        const mesh = searchPlugin.search(this.search)
+        
+        await teleportHandler.invoke(new RemoveFloorCommand(mesh))
     }
 }
 

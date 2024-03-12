@@ -16,7 +16,7 @@ class SpatialUIImage extends SpatialUIElement {
     constructor(texture, width, height) {
         super(new THREE.Mesh(
             new THREE.PlaneGeometry(width, height),
-            new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide })
+            new THREE.MeshBasicMaterial({ map: texture })
         ));
     }
 
