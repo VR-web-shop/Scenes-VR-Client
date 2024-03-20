@@ -83,7 +83,7 @@ onMounted(async () => {
     //await shop.invoke(new RemoveMeshCommand({ name: 'Chair' }))
     //await shop.invoke(new RemoveLightCommand({ name: 'Light' }))
     //await shop.invoke(new RemovePrimitiveCommand({ name: 'Plane' }))
-    
+
 })
 onUnmounted(async () => {
     await shop.invoke(new RemoveOnStateChangeListener(onStateChanged))
