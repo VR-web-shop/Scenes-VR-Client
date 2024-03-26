@@ -118,8 +118,14 @@ class CachesPlugin extends Plugin {
         const loader = new GLTFLoader()
         const gltf = await loader.loadAsync(url)
         const mesh = gltf.scene
+
+        const wrapper = new THREE.Object3D()
+        const box3 = new THREE.Box3().setFromObject(mesh)
+        const center = box3.getCenter(new THREE.Vector3())
+        mesh.position.sub(center)
+        wrapper.add(mesh)
         
-        mesh.traverse(async child => {
+        wrapper.traverse(async child => {
             if (child.isMesh) {
                 const submesh = submeshes.find(e => e.name === child.name)
                 if (submesh) {
@@ -128,9 +134,9 @@ class CachesPlugin extends Plugin {
             }
         })
 
-        cacheList.meshes[key] = [mesh]
+        cacheList.meshes[key] = [wrapper]
 
-        return mesh
+        return wrapper
     }
 
     /**

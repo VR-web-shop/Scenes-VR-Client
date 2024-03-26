@@ -15,6 +15,7 @@ class AddWebXRCheckoutCommand extends Command {
      * @param {Object} search - The search for the object 3d.
      * @param {Object} surfaceOffset - The offset for the surface.
      * @param {Object} surfaceSize - The size for the surface.
+     * @param {Object} UIOffset - The offset for the UI shown at the checkout.
      * @param {Object} UIRotation - The rotation for the UI shown at the checkout.
      * Possible parameters are: name, uuid
      * Note: Select only one parameter.

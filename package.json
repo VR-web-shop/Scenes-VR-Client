@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vr-web-shop/scenes": "1.0.2",
+    "@vr-web-shop/scenes": "1.0.39",
     "@vr-web-shop/auth": "1.0.38",
     "@vr-web-shop/shopping-cart": "1.0.2",
     "three": "^0.162.0",
