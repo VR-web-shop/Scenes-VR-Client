@@ -1,5 +1,5 @@
 import WebXRHandlerCommand from "../../../abstractions/WebXRHandlerCommand.js";
-import CheckoutUI from "../CheckoutUI.js";
+
 /**
  * @class SetQuantityUIInterfaceCommand
  * @classdesc command for setting the basket's quantity UI interface.
@@ -28,7 +28,7 @@ class SetQuantityUIInterfaceCommand extends WebXRHandlerCommand {
      * @async
      */
     async execute(options) {
-        CheckoutUI.setQuantityInterface(this.uiInterface)
+        options.quantityUI = this.uiInterface
     }
 }
 

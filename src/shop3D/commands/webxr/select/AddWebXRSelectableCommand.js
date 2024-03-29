@@ -1,6 +1,6 @@
-import Command from "../../abstractions/commands/Command.js";
-import SelectableProduct from "../../plugins/webxr/handlers/select/selectables/SelectableProduct.js";
-import AddSelectableCommand from "../../plugins/webxr/handlers/select/commands/AddSelectableCommand.js";
+import Command from "../../../abstractions/commands/Command.js";
+import SelectableProduct from "../../../plugins/webxr/handlers/select/selectables/SelectableProduct.js";
+import AddSelectableCommand from "../../../plugins/webxr/handlers/select/commands/AddSelectableCommand.js";
 import * as THREE from 'three'
 
 /**

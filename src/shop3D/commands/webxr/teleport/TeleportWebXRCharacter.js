@@ -1,5 +1,5 @@
-import Command from "../../abstractions/commands/Command.js";
-import TeleportToPositionCommand from "../../plugins/webxr/handlers/teleport/commands/TeleportToPositionCommand.js";
+import Command from "../../../abstractions/commands/Command.js";
+import TeleportToPositionCommand from "../../../plugins/webxr/handlers/teleport/commands/TeleportToPositionCommand.js";
 import * as THREE from 'three'
 
 /**
@@ -26,6 +26,11 @@ class TeleportWebXRCharacter extends Command {
      * @returns {void}
      */
     async execute(options) {
+        const view = options.view        
+        if (!view.renderer.xr.getSession()) {
+            throw new Error('XR characters can only be teleported when in an active XR session.')
+        }
+
         const webxrPlugin = options.plugins.find('webxr')
         const teleportHandler = webxrPlugin.getHandler('teleport')
         const position = new THREE.Vector3(this.position.x, this.position.y, this.position.z)

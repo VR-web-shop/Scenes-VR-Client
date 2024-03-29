@@ -1,5 +1,5 @@
-import Command from "../../abstractions/commands/Command.js";
-import AddCheckoutCommand from "../../plugins/webxr/handlers/basket/commands/AddCheckoutCommand.js";
+import Command from "../../../abstractions/commands/Command.js";
+import AddCheckoutCommand from "../../../plugins/webxr/handlers/basket/commands/AddCheckoutCommand.js";
 import * as THREE from "three";
 
 /**

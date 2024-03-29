@@ -59,7 +59,7 @@ export default class SpatialUIElement {
      * @returns {void}
      * @throws {Error} The visible must be a boolean.
      */
-    setVisbility(visible) {
+    setVisibility(visible) {
         if (typeof visible !== 'boolean') {
             throw new Error('The visible must be a boolean');
         }

@@ -1,5 +1,5 @@
-import Command from "../../abstractions/commands/Command.js";
-import RemoveCheckoutCommand from "../../plugins/webxr/handlers/basket/commands/RemoveCheckoutCommand.js";
+import Command from "../../../abstractions/commands/Command.js";
+import RemoveCheckoutCommand from "../../../plugins/webxr/handlers/basket/commands/RemoveCheckoutCommand.js";
 
 /**
  * @class RemoveWebXRCheckoutCommand

@@ -1,10 +1,16 @@
 import Selectable from '../Selectable.js'
 
+/**
+ * singleton
+ */
+let selectableBasket = null
+
 class SelectablePocket extends Selectable {
-    constructor(mesh, pocketOffset, selectableChild) {
+    constructor(mesh, selectableChild) {
         super(mesh)
-        this.pocketOffset = pocketOffset
-        this.selectableChild = selectableChild        
+        this.selectableChild = selectableChild
+        
+        selectableBasket = this
     }
 
     onSelect() {
@@ -12,6 +18,10 @@ class SelectablePocket extends Selectable {
     }
 
     onDeselect() {
+    }
+
+    static getSelectablePocket() {
+        return selectableBasket
     }
 }
 

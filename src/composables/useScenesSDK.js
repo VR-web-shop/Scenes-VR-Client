@@ -4,11 +4,11 @@ import SetCameraCommand from '../shop3D/commands/view/SetCameraCommand.js';
 import SetSceneBggCommand from '../shop3D/commands/view/SetSceneBggCommand.js';
 import LoadLightCommand from '../shop3D/commands/lights/LoadLightCommand.js';
 import LoadMeshCommand from '../shop3D/commands/caches/LoadMeshCommand.js';
-import AddWebXRFloorCommand from '../shop3D/commands/webxr/AddWebXRFloorCommand.js';
-import AddWebXRSelectableCommand from '../shop3D/commands/webxr/AddWebXRSelectableCommand.js';
-import AddWebXRCheckoutCommand from '../shop3D/commands/webxr/AddWebXRCheckoutCommand.js';
-import AddWebXRBasketCommand from '../shop3D/commands/webxr/AddWebXRBasketCommand.js';
-import SetWebXRStartPositionCommand from '../shop3D/commands/webxr/SetWebXRStartPositionCommand.js';
+import AddWebXRFloorCommand from '../shop3D/commands/webxr/teleport/AddWebXRFloorCommand.js';
+import AddWebXRSelectableCommand from '../shop3D/commands/webxr/select/AddWebXRSelectableCommand.js';
+import AddWebXRCheckoutCommand from '../shop3D/commands/webxr/checkout/AddWebXRCheckoutCommand.js';
+import AddWebXRBasketCommand from '../shop3D/commands/webxr/checkout/AddWebXRBasketCommand.js';
+import SetWebXRStartPositionCommand from '../shop3D/commands/webxr/teleport/SetWebXRStartPositionCommand.js';
 
 const SERVER_URL = 'http://localhost:3003'
 const sdk = new SceneSDK(SERVER_URL)
@@ -36,7 +36,8 @@ export function useSceneSDK() {
             ...SceneFloors,
             ...SceneCheckouts,
             {...SceneBasket, Mesh: SceneBasket.Object},
-            {...SceneBasket, uuid: SceneBasket.uuid+'-ph', Mesh: SceneBasket.Placeholder}
+            {...SceneBasket, uuid: SceneBasket.uuid+'-ph', Mesh: SceneBasket.Placeholder},
+            {...SceneBasket, uuid: SceneBasket.uuid+'-pk', Mesh: SceneBasket.Pocket}
         ]);
 
         await WebXrUtils.loadWebXR(
@@ -52,11 +53,11 @@ export function useSceneSDK() {
                 { model: 'SceneLights', include: ['Position', 'Rotation'] },
                 { model: 'SceneStaticObjects', include: ['Position', 'Rotation', 'Scale', 'Mesh'] },
                 { model: 'SceneFloors', include: ['Position', 'Rotation', 'Scale', 'Mesh'] },
-                { model: 'SceneBasket', include: ['Position', 'Rotation', 'Scale', 'Object', 'Placeholder', 'ObjectOffset', 'PlaceholderOffset', 'InsertAreaOffset', 'InsertAreaSize'] },
+                { model: 'SceneBasket', include: ['Position', 'Rotation', 'Scale', 'Object', 'Placeholder', 'Pocket', 'ObjectOffset', 'PlaceholderOffset', 'PocketOffset', 'InsertAreaOffset', 'InsertAreaSize'] },
                 { model: 'SceneCheckouts', include: ['Position', 'Rotation', 'Scale', 'SurfaceOffset', 'SurfaceSize', 'UIOffset', 'UIRotation', 'Mesh'] },
-                { model: 'SceneProducts', include: ['Position', 'Rotation', 'Scale', 'Mesh', 'Product'] },
+                { model: 'SceneProducts', include: ['Position', 'Rotation', 'Scale', 'Mesh', 'Product'] },                
+                { model: 'SceneCharacter', include: ['Position', 'Rotation']},
                 { model: 'SceneBackground' },
-                { model: 'SceneCharacter', include: ['Position', 'Rotation']}
             ]
         });
 
@@ -101,7 +102,11 @@ class MeshUtils {
 
     static async loadMeshes(shop, meshObjects) {
         for (const object of meshObjects) {
-            console.log('Loading mesh', object);
+            if (!object.Mesh) {
+                console.log('Object does not have a mesh', object);
+                continue;
+            }
+
             const submeshes = await MeshUtils.buildSubmeshes(object.Mesh.uuid);
             await shop.invoke(new LoadMeshCommand(
                 object.Mesh.source,
@@ -117,6 +122,8 @@ class MeshUtils {
 
 class WebXrUtils {
     static async loadWebXR(shop, lights, floors, products, checkouts, basket, character) {
+        await shop.invoke(new SetWebXRStartPositionCommand(character.Position, character.Rotation));
+
         for (const light of lights) {
             await shop.invoke(new LoadLightCommand(
                 light.scene_light_type_name, 
@@ -155,12 +162,12 @@ class WebXrUtils {
         await shop.invoke(new AddWebXRBasketCommand(
             { name: basket.uuid },
             { name: basket.uuid+'-ph' },
+            { name: basket.uuid+'-pk' },
             basket.ObjectOffset,
             basket.PlaceholderOffset,
+            basket.PocketOffset,
             basket.InsertAreaOffset,
             basket.InsertAreaSize
         ));
-
-        await shop.invoke(new SetWebXRStartPositionCommand(character.Position, character.Rotation));
     }
 }

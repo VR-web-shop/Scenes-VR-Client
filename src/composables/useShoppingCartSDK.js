@@ -1,11 +1,11 @@
 import ShoppingCartSDK from '@vr-web-shop/shopping-cart'
 import { ref } from 'vue'
 
-import AddWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/AddWebXRCheckoutListenerCommand'
-import AddWebXRAddProductListenerCommand from '../shop3D/commands/webxr/AddWebXRAddProductListenerCommand'
+import AddWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/checkout/AddWebXRCheckoutListenerCommand'
+import AddWebXRAddProductListenerCommand from '../shop3D/commands/webxr/checkout/AddWebXRAddProductListenerCommand'
 
-import RemoveWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/RemoveWebXRCheckoutListenerCommand'
-import RemoveWebXRAddProductListenerCommand from '../shop3D/commands/webxr/RemoveWebXRAddProductListenerCommand'
+import RemoveWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/checkout/RemoveWebXRCheckoutListenerCommand'
+import RemoveWebXRAddProductListenerCommand from '../shop3D/commands/webxr/checkout/RemoveWebXRAddProductListenerCommand'
 
 const SERVER_URL = 'http://localhost:3004'
 const sdk = new ShoppingCartSDK(SERVER_URL)

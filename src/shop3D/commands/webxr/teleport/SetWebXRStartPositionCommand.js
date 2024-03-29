@@ -1,5 +1,5 @@
-import Command from "../../abstractions/commands/Command.js";
-import SetStartPositionCommand from "../../plugins/webxr/handlers/teleport/commands/SetStartPositionCommand.js";
+import Command from "../../../abstractions/commands/Command.js";
+import SetStartPositionCommand from "../../../plugins/webxr/handlers/teleport/commands/SetStartPositionCommand.js";
 import * as THREE from 'three'
 
 /**

@@ -1,5 +1,5 @@
-import Command from "../../abstractions/commands/Command.js";
-import RemoveSelectableCommand from "../../plugins/webxr/handlers/select/commands/RemoveSelectableCommand.js";
+import Command from "../../../abstractions/commands/Command.js";
+import RemoveSelectableCommand from "../../../plugins/webxr/handlers/select/commands/RemoveSelectableCommand.js";
 
 /**
  * @class RemoveWebXRSelectableCommand

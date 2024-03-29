@@ -7,13 +7,13 @@ import * as THREE from 'three'
 let selectableBasket = null
 
 class SelectableBasket extends Selectable {
-    constructor(mesh, placeholderMesh, selectOffset, placeholderOffset, checkoutHandler) {
+    constructor(mesh, placeholderMesh, selectOffset, placeholderOffset, insertAreaOffset, insertAreaSize, checkoutHandler) {
         super(mesh)
         this.placeholderMesh = placeholderMesh
         this.checkoutHandler = checkoutHandler
         this.checkout = null
         
-        this.insertArea = new InsertArea(this)
+        this.insertArea = new InsertArea(this, insertAreaOffset, insertAreaSize)
         this.inventory = new Inventory()
         
         this.mesh.visible = false
@@ -74,19 +74,6 @@ class InsertArea {
             new THREE.MeshBasicMaterial({ wireframe: true, color: 0x00FF00})
         )
         basket.mesh.add(this.meshHelper)
-    }
-
-    setOffset(offset) {
-        this.offset.copy(offset)
-        this.meshHelper.position.copy(this.basketPosition).add(this.offset)
-    }
-
-    setSize(size) {
-        this.size.copy(size)
-        console.log(this.size)
-        const BoxGeometry = new THREE.BoxGeometry(this.size.x, this.size.y, this.size.z)
-        this.meshHelper.geometry.dispose()
-        this.meshHelper.geometry = BoxGeometry
     }
 
     getCenter() {

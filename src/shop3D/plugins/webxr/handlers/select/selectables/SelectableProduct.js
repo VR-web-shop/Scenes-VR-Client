@@ -43,8 +43,28 @@ class SelectableProduct extends Selectable {
         this.productEntitiesInUse = []
     }
 
+    getPrice() {
+        return 0
+    }
+
+    getImageSource() {
+        return "images/couch_center.png"
+    }
+
+    getProductEntities() {
+        return this.productEntities
+    }
+
+    getSelectedProductEntities() {
+        return this.productEntitiesInUse
+    }
+
     getAvailableProductEntities() {
         return this.productEntities.filter(productEntity => !this.productEntitiesInUse.includes(productEntity))
+    }
+
+    removeFromBasket() {
+        this.productEntitiesInUse.forEach(productEntity => this.releaseProductEntity(productEntity))
     }
 
     reserveProductEntity(productEntity) {

@@ -16,7 +16,6 @@ class SetSelectedCommand extends WebXRHandlerCommand {
     constructor(controller, selectable) {
         super()
 
-        console.log('controller', controller)
         if (!(controller instanceof THREE.Object3D)) {
             throw new Error('The controller must be an instance of THREE.Object3D')
         }

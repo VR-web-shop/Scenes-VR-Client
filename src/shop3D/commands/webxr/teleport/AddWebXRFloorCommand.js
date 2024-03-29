@@ -1,5 +1,5 @@
-import Command from "../../abstractions/commands/Command.js";
-import AddFloorCommand from "../../plugins/webxr/handlers/teleport/commands/AddFloorCommand.js";
+import Command from "../../../abstractions/commands/Command.js";
+import AddFloorCommand from "../../../plugins/webxr/handlers/teleport/commands/AddFloorCommand.js";
 
 /**
  * @class AddWebXRFloor

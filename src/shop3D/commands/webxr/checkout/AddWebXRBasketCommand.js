@@ -1,19 +1,19 @@
-import Command from "../../abstractions/commands/Command.js";
+import Command from "../../../abstractions/commands/Command.js";
 
-import FindUIObjectByName from "../../plugins/webxr/handlers/gui/commands/FindUIObjectByName.js";
-import AddUIObjectCommand from "../../plugins/webxr/handlers/gui/commands/AddUIObjectCommand.js";
+import FindUIObjectByName from "../../../plugins/webxr/handlers/gui/commands/FindUIObjectByName.js";
+import AddUIObjectCommand from "../../../plugins/webxr/handlers/gui/commands/AddUIObjectCommand.js";
 
-import AddSelectableCommand from "../../plugins/webxr/handlers/select/commands/AddSelectableCommand.js";
-import SelectableBasket from "../../plugins/webxr/handlers/select/selectables/SelectableBasket.js";
-import SelectablePocket from "../../plugins/webxr/handlers/select/selectables/SelectablePocket.js";
+import AddSelectableCommand from "../../../plugins/webxr/handlers/select/commands/AddSelectableCommand.js";
+import SelectableBasket from "../../../plugins/webxr/handlers/select/selectables/SelectableBasket.js";
+import SelectablePocket from "../../../plugins/webxr/handlers/select/selectables/SelectablePocket.js";
 
-import AddFollowObjectCommand from "../../plugins/webxr/handlers/follow/commands/AddFollowObject.js";
+import AddFollowObjectCommand from "../../../plugins/webxr/handlers/follow/commands/AddFollowObject.js";
 
-import SetQuantityUIInterfaceCommand from "../../plugins/webxr/handlers/basket/commands/SetQuantityUIInterfaceCommand.js";
-import SetCheckoutUIInterfaceCommand from "../../plugins/webxr/handlers/basket/commands/SetCheckoutUIInterfaceCommand.js";
-import { buildBasketUI, buildQuantityUI } from "../../plugins/webxr/handlers/basket/CheckoutUI.js";
+import SetQuantityUIInterfaceCommand from "../../../plugins/webxr/handlers/basket/commands/SetQuantityUIInterfaceCommand.js";
+import SetCheckoutUIInterfaceCommand from "../../../plugins/webxr/handlers/basket/commands/SetCheckoutUIInterfaceCommand.js";
 
-
+import { buildBasketUI } from "../../../plugins/webxr/handlers/basket/ui/checkout/main.js";
+import { buildQuantityUI } from "../../../plugins/webxr/handlers/basket/ui/quantity/main.js";
 import * as THREE from "three";
 
 
@@ -29,25 +29,36 @@ class AddWebXRBasketCommand extends Command {
      * @constructor
      * @param {Object} searchBasketMesh - The search for the object 3d.
      * @param {Object} searchPlaceholderMesh - The search for the placeholder object 3d.
+     * @param {Object} searchPocketMesh - The search for the pocket object 3d.
      * @param {THREE.Vector3} selectOffset - The offset for the controller select.
      * @param {THREE.Vector3} placeholderOffset - The offset for the placeholder object 3d.
+     * @param {THREE.Vector3} pocketOffset - The offset for the insert area.
+     * @param {THREE.Vector3} insertAreaOffset - The offset for the insert area.
+     * @param {THREE.Vector3} insertAreaSize - The size for the insert area.
+     * @param {THREE.Vector3} selectablePocketOffset - The offset for the selectable pocket.
+     * @param {THREE.Vector3} selectablePocketSize - The size for the selectable pocket.
+     * @param {number} selectablePocketColor - The color for the selectable pocket.
      * Possible parameters are: name, uuid
      * Note: Select only one parameter.
-     * @example new AddWebXRBasketCommand( { name: 'meshName' }, { name: 'meshName' } )
-     * @example new AddWebXRBasketCommand( { uuid: 'meshUUID' }, { name: 'meshUUID' } )
+     * @example new AddWebXRBasketCommand( { name: 'meshName' }, { name: 'meshName' }, { name: 'meshName' } )
+     * @example new AddWebXRBasketCommand( { uuid: 'meshUUID' }, { name: 'meshUUID' }, { name: 'meshUUID' } )
      */
     constructor(
         searchBasketMesh, 
         searchPlaceholderMesh, 
+        searchPocketMesh,
         selectOffset = { x: 0, y: 0, z: 0 }, 
         placeholderOffset = { x: 0, y: 0, z: 0 },
+        pocketOffset = { x: 0, y: 0, z: 0 },
         insertAreaOffset = { x: 0, y: 0, z: 0 },
         insertAreaSize = { x: 1, y: 1, z: 1 }) {
         super()
         this.searchBasketMesh = searchBasketMesh
         this.searchPlaceholderMesh = searchPlaceholderMesh
+        this.searchPocketMesh = searchPocketMesh
         this.selectOffset = selectOffset
         this.placeholderOffset = placeholderOffset
+        this.pocketOffset = pocketOffset
         this.insertAreaOffset = insertAreaOffset
         this.insertAreaSize = insertAreaSize
     }
@@ -67,28 +78,39 @@ class AddWebXRBasketCommand extends Command {
         const guiHandler = webxrPlugin.getHandler('gui')
         const followHandler = webxrPlugin.getHandler('follow')
 
-        const offset = new THREE.Vector3(this.selectOffset.x, this.selectOffset.y, this.selectOffset.z)
+        /**
+         * Create Basket Selectable.
+         */
+        const objectOffset = new THREE.Vector3(this.selectOffset.x, this.selectOffset.y, this.selectOffset.z)
         const placeholderOffset = new THREE.Vector3(this.placeholderOffset.x, this.placeholderOffset.y, this.placeholderOffset.z)
         const insertAreaOffset = new THREE.Vector3(this.insertAreaOffset.x, this.insertAreaOffset.y, this.insertAreaOffset.z)
         const insertAreaSize = new THREE.Vector3(this.insertAreaSize.x, this.insertAreaSize.y, this.insertAreaSize.z)
-
         const basketMesh = searchPlugin.search(this.searchBasketMesh)
         const placeholderMesh = searchPlugin.search(this.searchPlaceholderMesh)
-        const selectable = new SelectableBasket(basketMesh, placeholderMesh, offset, placeholderOffset, checkoutHandler)
-        selectable.insertArea.setOffset(insertAreaOffset)
-        selectable.insertArea.setSize(insertAreaSize)
+        const selectable = new SelectableBasket(
+            basketMesh, 
+            placeholderMesh, 
+            objectOffset, 
+            placeholderOffset,
+            insertAreaOffset,
+            insertAreaSize, 
+            checkoutHandler
+        )
+        await selectHandler.invoke(new AddSelectableCommand(selectable))
         
-        const selectablePocketMesh = new THREE.Mesh(
-            new THREE.BoxGeometry(.1, .1, .1),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true }
-        ))
-        const selectablePocket = new SelectablePocket(selectablePocketMesh, new THREE.Vector3(0, 0, 0), selectable)
+        /**
+         * Create Pocket Selectable.
+         */
+        const pocketMesh = searchPlugin.search(this.searchPocketMesh)
+        const selectablePocketOffset = new THREE.Vector3(this.pocketOffset.x, this.pocketOffset.y, this.pocketOffset.z)
+        const selectablePocket = new SelectablePocket(pocketMesh, selectable)
+        await followHandler.invoke(new AddFollowObjectCommand(selectablePocket.mesh, selectablePocketOffset))
+        await selectHandler.invoke(new AddSelectableCommand(selectablePocket))
         view.scene.add(selectablePocket.mesh)
 
-        await followHandler.invoke(new AddFollowObjectCommand(selectablePocket.mesh, new THREE.Vector3(-.2, -.3, -.25)))
-        await selectHandler.invoke(new AddSelectableCommand(selectable))
-        await selectHandler.invoke(new AddSelectableCommand(selectablePocket))
-
+        /**
+         * Create checkout UI.
+         */
         const basketUIContainer = await guiHandler.invoke(new FindUIObjectByName('basket'))
         if (!basketUIContainer) {
             const ui = await buildBasketUI(guiHandler)
@@ -96,6 +118,9 @@ class AddWebXRBasketCommand extends Command {
             await checkoutHandler.invoke(new SetCheckoutUIInterfaceCommand(ui.uiInterface))
         }
 
+        /**
+         * Create quantity UI.
+         */
         const quantityUIContainer = await guiHandler.invoke(new FindUIObjectByName('quantity'))
         if (!quantityUIContainer) {
             const ui = await buildQuantityUI(guiHandler)

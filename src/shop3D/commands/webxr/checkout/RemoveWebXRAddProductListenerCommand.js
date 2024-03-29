@@ -1,5 +1,5 @@
-import Command from "../../abstractions/commands/Command.js";
-import SelectableBasket from "../../plugins/webxr/handlers/select/selectables/SelectableBasket.js";
+import Command from "../../../abstractions/commands/Command.js";
+import RemoveProductEventListenerCommand from "../../../plugins/webxr/handlers/basket/commands/RemoveProductEventListenerCommand.js";
 
 /**
  * @class RemoveWebXRAddProductListenerCommand
@@ -11,11 +11,16 @@ class RemoveWebXRAddProductListenerCommand extends Command {
 
     /**
      * @constructor
-     * @param {string} type - The type of event: 'startCheckout', 'cancelCheckout'
+     * @param {string} type - The type of event: 'addProduct', 'removeProduct'
      * @param {Function} callback - The callback for the event.
      */
     constructor(type, callback) {
         super()
+
+        if (type !== 'addProduct' && type !== 'removeProduct') {
+            throw new Error('The type must be either "addProduct" or "removeProduct"')
+        }
+
         this.type = type
         this.callback = callback
     }
@@ -27,7 +32,10 @@ class RemoveWebXRAddProductListenerCommand extends Command {
      * @returns {void}
      */
     async execute(options) {
-        SelectableBasket.getSelectableBasket().inventory.removeEventListener(this.type, this.callback)
+        const webxrPlugin = options.plugins.find('webxr')
+        const checkoutHandler = webxrPlugin.getHandler('checkout')
+
+        await checkoutHandler.invoke(new RemoveProductEventListenerCommand(this.type, this.callback))
     }
 }
 
