@@ -1,12 +1,5 @@
 import WebXRHandler from '../../abstractions/WebXRHandler.js'
-import Basket from './Basket.js';
-import SelectPoint from './SelectPoint.js';
 import * as THREE from 'three'
-
-/**
- * @property {Basket} basket - The basket.
- */
-const basket = new Basket()
 
 /**
  * @property {Object} _view - The view.
@@ -19,18 +12,13 @@ let _view = null;
 let selectPoint = null;
 
 /**
- * @property {Checkout[]} checkouts - The checkouts.
- */
-const checkouts = []
-
-/**
  * @function initializeBasketSelectPoint
  * @description Initialize the basket select point.
  * @returns {void}
  */
 function initializeBasketSelectPoint() {
-    selectPoint = new SelectPoint(_view, new THREE.Vector3(-1, -.5, -.5))
-    selectPoint.followVRPlayer()
+    //selectPoint = new SelectPoint(_view, new THREE.Vector3(-1, -.5, -.5))
+    //selectPoint.followVRPlayer()
 }
 
 /**
@@ -109,10 +97,20 @@ function clearCheckouts() {
 }
 
 /**
- * @class BasketHandler
- * @classdesc The basket handler.
+ * @property {Basket} basket - The basket.
  */
-class BasketHandler extends WebXRHandler {
+let basket = {};
+
+/**
+ * @property {Checkout[]} checkouts - The checkouts.
+ */
+const checkouts = [];
+
+/**
+ * @class CheckoutHandler
+ * @classdesc The checkout handler.
+ */
+class CheckoutHandler extends WebXRHandler {
 
     /**
      * @constructor
@@ -133,15 +131,15 @@ class BasketHandler extends WebXRHandler {
         this.controllers = controllers
 
         // Note: If the xr session is ended, release the basket and clear the select point.
-        view.renderer.xr.addEventListener('sessionstart', initializeBasketSelectPoint)
-        view.renderer.xr.addEventListener('sessionend', clearBasketSelectPoint)
-        view.renderer.xr.addEventListener('sessionend', releaseBasket)
+        // view.renderer.xr.addEventListener('sessionstart', initializeBasketSelectPoint)
+        // view.renderer.xr.addEventListener('sessionend', clearBasketSelectPoint)
+        // view.renderer.xr.addEventListener('sessionend', releaseBasket)
 
         for (let i = 0; i < controllers.length; i++) {
             const controller = controllers[i]
 
-            controller.addEventListener('squeezestart', grapBasket)
-            controller.addEventListener('squeezeend', releaseBasket)
+            //controller.addEventListener('squeezestart', grapBasket)
+            //controller.addEventListener('squeezeend', releaseBasket)
         }
 
         this.initInvoker({ basket, checkouts })
@@ -153,21 +151,29 @@ class BasketHandler extends WebXRHandler {
      * @returns {void}
      */
     exit() {
-        clearCheckouts()
-        clearBasketSelectPoint()
-        clearBasket()
+        // clearCheckouts()
+        // clearBasketSelectPoint()
+        // clearBasket()
 
-        _view.renderer.xr.removeEventListener('sessionstart', initializeBasketSelectPoint)
-        _view.renderer.xr.removeEventListener('sessionend', clearBasketSelectPoint)
-        _view.renderer.xr.removeEventListener('sessionend', releaseBasket)
+        // _view.renderer.xr.removeEventListener('sessionstart', initializeBasketSelectPoint)
+        // _view.renderer.xr.removeEventListener('sessionend', clearBasketSelectPoint)
+        // _view.renderer.xr.removeEventListener('sessionend', releaseBasket)
 
         for (let i = 0; i < this.controllers.length; i++) {
             const controller = this.controllers[i]
 
-            controller.removeEventListener('squeezestart', grapBasket)
-            controller.removeEventListener('squeezeend', releaseBasket)
+            //controller.removeEventListener('squeezestart', grapBasket)
+            //controller.removeEventListener('squeezeend', releaseBasket)
         }
+    }
+
+    getCheckouts() {
+        return checkouts
+    }
+
+    getBasket() {
+        return basket
     }
 }
 
-export default BasketHandler
+export default CheckoutHandler

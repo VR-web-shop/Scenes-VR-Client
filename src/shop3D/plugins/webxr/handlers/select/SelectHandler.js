@@ -1,5 +1,6 @@
 import WebXRHandler from '../../abstractions/WebXRHandler.js'
 import Selectable from './Selectable.js'
+import SocketMesh from './sockets/SocketMesh.js'
 import * as THREE from 'three'
 
 /**
@@ -8,74 +9,32 @@ import * as THREE from 'three'
 const selectables = []
 
 /**
- * @property selectOffset - The select offset.
+ * @property controllerSockets - The controller sockets.
  */
-const selectOffset = new THREE.Vector3()
+const controllerSockets = []
 
 /**
- * @property _view - The view.
- */
-let _view = null
-
-/**
- * @property selected - The selected.
- */
-let selected = null
-
-/**
- * @function updateSelected
- * @description Update the selected object's position.
+ * @function updateLoop
+ * @description Update the loop.
  * @returns {void}
- * @private
  */
-function updateSelected() {
-    if (selected) {
-        const nextPosition = selected.target.position.clone().sub(selectOffset)
-        selected.selectable.setPosition(nextPosition)
+function updateLoop() {
+    for (let i = 0; i < controllerSockets.length; i++) {
+        controllerSockets[i].updateSelectedPosition()
     }
 }
 
-/**
- * @function setSelected
- * @description Set the selected.
- * @param {THREE.Object3D} target - The target.
- * @param {Selectable} selectable - The selectable.
- * @returns {void}
- */
-function setSelected(target, selectable) {
-    if (selected) clearSelected()
-    selected = { target, selectable }
-    selected.selectable.onSelect()
-    selectOffset.copy(target.position).sub(selectable.mesh.position)
-    _view.addBeforeRenderListener(updateSelected)
+function select(event) {
+    const controller = event.target
+    const socket = controllerSockets.find(socket => socket.mesh.uuid === controller.uuid)
+    const selectable = socket.intersect(selectables)
+    if (selectable) socket.setSelected(selectable)
 }
 
-/**
- * @function startSelecting
- * @description Start selecting.
- * @param {Object} event - The event.
- * @returns {void}
- * @private
- */
-function startSelecting(event) {
-    const target = event.target;
-    const box = new THREE.Box3().setFromObject(target);
-    const selectable = selectables.find(selectable => selectable.intersectsBox(box))
-    if (selectable) setSelected(target, selectable)
-}
-
-/**
- * @function clearSelected
- * @description Clear the selected.
- * @returns {void}
- * @private
- */
-function clearSelected(event) {
-    if (selected) {
-        _view.removeBeforeRenderListener(updateSelected)
-        selected.selectable.onDeselect()
-        selected = null
-    }
+function deselect(event) {
+    const controller = event.target
+    const socket = controllerSockets.find(socket => socket.mesh.uuid === controller.uuid)
+    socket.removeSelected()
 }
 
 /**
@@ -89,7 +48,6 @@ class SelectHandler extends WebXRHandler {
      */
     constructor() {
         super()
-        Selectable.setHandler(this)
     }
 
     /**
@@ -101,19 +59,22 @@ class SelectHandler extends WebXRHandler {
      */
     init(view, controllers) {
         this.controllers = controllers
-        _view = view
-
-        // Note: If the xr session is ended, clear the selected.
-        view.renderer.xr.addEventListener('sessionend', clearSelected)
+        this.view = view
 
         for (let i = 0; i < controllers.length; i++) {
             const controller = controllers[i]
+            const controllerSocket = new SocketMesh(controller)
 
-            controller.addEventListener('squeezestart', startSelecting)
-            controller.addEventListener('squeezeend', clearSelected)
+            controller.addEventListener('squeezestart', select)
+            controller.addEventListener('squeezeend', deselect)
+
+            controllerSockets.push(controllerSocket)
         }
 
-        this.initInvoker({ selectables, setSelected })
+        // Note: If the xr session is ended, clear the selected.
+        this.view.renderer.xr.addEventListener('sessionend', deselect)
+        this.view.addBeforeRenderListener(updateLoop)
+        this.initInvoker({ selectables, controllerSockets })
     }
 
     /**
@@ -122,17 +83,18 @@ class SelectHandler extends WebXRHandler {
      * @returns {void}
      */
     exit() {
-        selectables.length = 0
-        clearSelected()
+        for (let i = 0; i < controllerSockets.length; i++) {
+            const controllerSocket = controllerSockets[i]
+            const controller = controllerSocket.controller
 
-        _view.renderer.xr.removeEventListener('sessionend', clearSelected)
-
-        for (let i = 0; i < this.controllers.length; i++) {
-            const controller = this.controllers[i]
-
-            controller.removeEventListener('squeezestart', startSelecting)
-            controller.removeEventListener('squeezeend', clearSelected)
+            controller.removeEventListener('squeezestart', select)
+            controller.removeEventListener('squeezeend', deselect)
         }
+
+        selectables.length = 0
+        controllerSockets.length = 0
+        this.view.renderer.xr.removeEventListener('sessionend', deselect)
+        this.view.removeBeforeRenderListener(updateLoop)
     }
 }
 

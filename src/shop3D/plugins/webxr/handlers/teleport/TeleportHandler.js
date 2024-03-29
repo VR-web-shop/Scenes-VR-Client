@@ -20,6 +20,13 @@ let _view = null
  */
 let pointer = null
 
+const startPosition = new THREE.Vector3()
+const position = new THREE.Vector3()
+
+export function getXRPosition() {
+    return position
+}
+
 /**
  * @function startTeleporting
  * @description Start teleporting.
@@ -43,15 +50,23 @@ function startTeleporting(event) {
 function endTeleporting(event) {
     const point = pointer.getPosition()
     clearPointer()
+    teleportTo(point)
+}
+
+function teleportTo(newPosition) {
+    const offsetPosition = position.sub(newPosition)
 
     // Teleport the user to the point.
     const xr = _view.renderer.xr
-    const baseReferenceSpace = xr.getReferenceSpace()
-    const offsetPosition = { x: - point.x, y: - point.y, z: - point.z, w: 1 };
-    const offsetRotation = new THREE.Quaternion();
-    const transform = new XRRigidTransform(offsetPosition, offsetRotation);
-    const teleportSpaceOffset = baseReferenceSpace.getOffsetReferenceSpace(transform);
-    xr.setReferenceSpace(teleportSpaceOffset);
+    const baseReferenceSpace = xr.getReferenceSpace();
+    const offsetTransform = new XRRigidTransform(
+        { x: offsetPosition.x, y: 0, z: offsetPosition.z },
+        { x: 0, y: offsetRotation.y, z: 0, w: 1 },
+    );
+    const newReferenceSpace = baseReferenceSpace.getOffsetReferenceSpace(offsetTransform);
+    xr.setReferenceSpace(newReferenceSpace);
+
+    position.copy(newPosition)
 }
 
 /**
@@ -77,6 +92,10 @@ function clearFloor() {
     floor.length = 0
 }
 
+function setupStartPosition() {
+    teleportTo(startPosition)
+}
+
 /**
  * @class TeleportHandler
  * @classdesc The teleport handler.
@@ -91,6 +110,7 @@ class TeleportHandler extends WebXRHandler {
         this.controllers = controllers
 
         // Note: If the xr session is ended, remove the teleporter.
+        view.renderer.xr.addEventListener('sessionstart', setupStartPosition)
         view.renderer.xr.addEventListener('sessionend', clearPointer)
 
         for (let i = 0; i < controllers.length; i++) {
@@ -100,13 +120,14 @@ class TeleportHandler extends WebXRHandler {
             controller.addEventListener('selectend', endTeleporting)
         }
 
-        this.initInvoker({ floor })
+        this.initInvoker({ floor, teleportTo, startPosition })
     }
 
     exit() {
         clearFloor()
         clearPointer()
 
+        _view.renderer.xr.removeEventListener('sessionstart', setupStartPosition)
         _view.renderer.xr.removeEventListener('sessionend', clearPointer)
 
         for (let i = 0; i < this.controllers.length; i++) {

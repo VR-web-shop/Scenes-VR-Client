@@ -16,6 +16,7 @@ class SetSelectedCommand extends WebXRHandlerCommand {
     constructor(controller, selectable) {
         super()
 
+        console.log('controller', controller)
         if (!(controller instanceof THREE.Object3D)) {
             throw new Error('The controller must be an instance of THREE.Object3D')
         }
@@ -36,8 +37,14 @@ class SetSelectedCommand extends WebXRHandlerCommand {
      * @async
      */
     async execute(options) {
-        this.selectable.mesh.position.copy(this.controller.position)
-        options.setSelected(this.controller, this.selectable);
+        const controllerSockets = options.controllerSockets
+        const socket = controllerSockets.find(socket => socket.mesh.uuid === this.controller.uuid)
+
+        if (!socket) {
+            throw new Error('The controller does not have a socket')
+        }
+
+        socket.setSelected(this.selectable)
     }
 }
 

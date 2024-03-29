@@ -130,6 +130,8 @@ function Basket() {
         
         selected = controller;
         selectable.select(controller)
+        
+        console.log(selectable)
     }
 
     /**

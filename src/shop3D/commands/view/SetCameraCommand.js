@@ -10,12 +10,14 @@ class SetCameraCommand extends Command {
 
     /**
      * @constructor
-     * @param {Object} position - The position of the light.
-     * @param {Object} target - The target of the light.
+     * @param {Object} position - The position of the camera.
+     * @param {Object} rotation - The rotation of the camera.
+     * @param {Object} target - The target of the camera.
      */
-    constructor(position, target = { x: 0, y: 0, z: 0 }) {
+    constructor(position, rotation = null, target = null) {
         super()
         this.position = position
+        this.rotation = rotation
         this.target = target
     }
 
@@ -29,7 +31,14 @@ class SetCameraCommand extends Command {
         const camera = options.view.camera
 
         camera.position.set(this.position.x, this.position.y, this.position.z)
-        camera.lookAt(this.target.x, this.target.y, this.target.z)
+
+        if (this.rotation) {
+            camera.rotation.set(this.rotation.x, this.rotation.y, this.rotation.z)
+        }
+
+        if (this.target) {
+            camera.lookAt(this.target.x, this.target.y, this.target.z)
+        }
     }
 }
 

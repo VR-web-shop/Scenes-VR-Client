@@ -64,6 +64,7 @@ function startSelecting(event) {
  * @private
  */
 function endSelecting(event) {
+    if (!guiSelector) return 
     const collisionObject = guiSelector.getCollisionObject()
     if (collisionObject) {
         const selectable = uiSelectables.find(selectable => selectable.object3D.uuid === collisionObject.uuid)

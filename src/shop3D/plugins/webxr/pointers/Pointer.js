@@ -78,10 +78,10 @@ function Pointer(target, view, getCollisionObjects) {
             lineBuffer.setFromPoints([target.position, point])
             cube.position.copy(point)
         } else {
-            lastCollisionObject = null
-            point.copy(targetPosition)
-            lineBuffer.setFromPoints([target.position, target.position])
-            cube.position.copy(targetPosition)
+            //lastCollisionObject = null
+            //point.copy(targetPosition)
+            //lineBuffer.setFromPoints([target.position, target.position])
+            //cube.position.copy(targetPosition)
         }
 
         if (!objectBefore || objectBefore && !lastCollisionObject || objectBefore.uuid !== lastCollisionObject.uuid) {

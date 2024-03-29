@@ -1,14 +1,11 @@
 import * as THREE from 'three'
-import SetSelectedCommand from './commands/SetSelectedCommand.js'
-import IsSelectedCommand from './commands/IsSelectedCommand.js'
-
-let _handler = null
 
 class Selectable {
     constructor(mesh) {
         this.mesh = mesh
         this.selectOffset = new THREE.Vector3()
         this.collider = new THREE.Box3().setFromObject(this.mesh)
+        this.socket = null
     }
 
     intersectsBox(otherBox) {
@@ -24,21 +21,19 @@ class Selectable {
         this.mesh.position.copy(target).add(this.selectOffset)
     }
 
+    select(socket) {
+        this.socket = socket
+        this.onSelect()
+    }
+
+    deselect() {
+        this.socket = null
+        this.onDeselect()
+    }
+
     onSelect() { }
     onDeselect() { }
-
-    async isSelected() {
-        console.log('Selectable isSelected')
-        return await _handler.invoke(new IsSelectedCommand(this))
-    }
-
-    async select(controller) {
-        await _handler.invoke(new SetSelectedCommand(controller, this))
-    }
-
-    static setHandler(handler) {
-        _handler = handler
-    }
+    isSelectable() { return true }
 }
 
 export default Selectable

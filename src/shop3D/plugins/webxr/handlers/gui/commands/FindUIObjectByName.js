@@ -28,7 +28,7 @@ class FindUIObjectByName extends WebXRHandlerCommand {
      * @async
      */
     async execute(options) {
-        return options.uiObjects.find(obj => obj.mesh.name === this.name)
+        return options.uiObjects.find(obj => obj.object3D.name === this.name)
     }
 }
 

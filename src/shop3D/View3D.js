@@ -35,7 +35,9 @@ class View3D extends View {
         this.canvas = canvas
         this.scene = new THREE.Scene()
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas })
+        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true })
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+        View3D.resizeRendererToDisplaySize(this)
     }
 
     /**
@@ -61,7 +63,7 @@ class View3D extends View {
      */
     render() {
         this.eventDispatcher.dispatchEvent({ type: 'beforerender' })
-        View3D.resizeRendererToDisplaySize(this)
+        //View3D.resizeRendererToDisplaySize(this)
         this.renderer.render(this.scene, this.camera)
     }
 

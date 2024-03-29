@@ -50,10 +50,10 @@ class AddWebXRCheckoutCommand extends Command {
         
         const searchPlugin = options.plugins.find('search')
         const webxrPlugin = options.plugins.find('webxr')
-        const basketHandler = webxrPlugin.getHandler('basket')
+        const checkoutHandler = webxrPlugin.getHandler('checkout')
         const mesh = searchPlugin.search(this.search)
         
-        await basketHandler.invoke(new AddCheckoutCommand(mesh, offset, size, UIOffset, UIRotation))
+        await checkoutHandler.invoke(new AddCheckoutCommand(mesh, offset, size, UIOffset, UIRotation))
     }
 }
 
