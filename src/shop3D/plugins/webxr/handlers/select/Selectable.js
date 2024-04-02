@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 
 class Selectable {
-    constructor(mesh) {
+    constructor(mesh, id) {
         this.mesh = mesh
+        this.id = id
         this.selectOffset = new THREE.Vector3()
         this.collider = new THREE.Box3().setFromObject(this.mesh)
         this.socket = null
@@ -29,6 +30,9 @@ class Selectable {
     deselect() {
         this.socket = null
         this.onDeselect()
+    }
+
+    onUpdate(options={}) {
     }
 
     onSelect() { }

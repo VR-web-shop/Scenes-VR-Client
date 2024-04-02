@@ -61,7 +61,7 @@ function teleportTo(newPosition) {
     const baseReferenceSpace = xr.getReferenceSpace();
     const offsetTransform = new XRRigidTransform(
         { x: offsetPosition.x, y: 0, z: offsetPosition.z },
-        { x: 0, y: offsetRotation.y, z: 0, w: 1 },
+        { x: 0, y: 0, z: 0, w: 1 },
     );
     const newReferenceSpace = baseReferenceSpace.getOffsetReferenceSpace(offsetTransform);
     xr.setReferenceSpace(newReferenceSpace);

@@ -1,6 +1,11 @@
 <script setup>
+import Toast from '../components/Toast.vue';
 </script>
 
 <template>
-  <router-view></router-view>
+    <div>
+      <Toast />
+      
+      <router-view></router-view>
+    </div>
 </template>

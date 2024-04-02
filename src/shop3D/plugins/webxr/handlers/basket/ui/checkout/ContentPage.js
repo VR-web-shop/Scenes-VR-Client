@@ -46,8 +46,8 @@ const cancelButtonPosition = new THREE.Vector3(0.7, -0.03, .0001)
  */
 const columns = 4
 const rows = 2
-const rowsSpacing = 0.25
-const columnsSpacing = 0.35
+const rowSpacing = 0.25
+const columnSpacing = 0.35
 
 /**
  * Content element options.
@@ -87,7 +87,11 @@ const contentElementBtnPosition = new THREE.Vector3(0, -0.08, .0001)
  * @description Build the content page.
  * @returns {void}
  */
-export function buildContentPage() {
+export function buildContentPage(guiHandler) {
+    if (!guiHandler) {
+        throw new Error('The GUI handler is required.')
+    }
+
     const content = new SpatialUI.SpatialUIBuilder()
         /**
          * Create the title text.
@@ -97,7 +101,7 @@ export function buildContentPage() {
          * Create a grid paginator to display the content.
          */
         .addGridPaginator(
-            { columns, rows, rowsSpacing, columnsSpacing },
+            { columns, rows, rowSpacing, columnSpacing },
             { width: btnWidth, height: btnHeight, color: btnBggColor, hoverColor: btnHoverColor, text: previousTextValue, textOptions: btnTextOptions, textColor: btnTextColor },
             { width: btnWidth, height: btnHeight, color: btnBggColor, hoverColor: btnHoverColor, text: nextTextValue, textOptions: btnTextOptions, textColor: btnTextColor },
             { text: pagesTextValue, textOptions, textColor },
@@ -166,42 +170,42 @@ export function buildContentPage() {
             )
             .build()
 
-            /**
-             * Get the card's image, text and button.
-             */
-            const image = card.images[0]
-            const text = card.texts[0]
-            const button = card.buttons[0]
+        /**
+         * Get the card's image, text and button.
+         */
+        const image = card.images[0]
+        const text = card.texts[0]
+        const button = card.buttons[0]
 
-            /**
-             * Set the positions.
-             */
-            image.setPosition(contentElementImgPosition)
-            text.setPosition(contentElementTextPosition)
-            button.setPosition(contentElementBtnPosition)
+        /**
+         * Set the positions.
+         */
+        image.setPosition(contentElementImgPosition)
+        text.setPosition(contentElementTextPosition)
+        button.setPosition(contentElementBtnPosition)
 
-            /**
-             * Add a click listener to the button.
-             */
-            button.addClickListener(() => {
-                // Remove from container
-                paginator.removeElement(card.container)
-                // Remove from GUI handler
-                guiHandler.invoke(new RemoveUIObjectCommand(card.container))
-                // Call the object's remove callback
-                contentObject.removeCallback(contentObject)
-            })
+        /**
+         * Add a click listener to the button.
+         */
+        button.addClickListener(() => {
+            // Remove from container
+            paginator.removeElement(card.container)
+            // Remove from GUI handler
+            guiHandler.invoke(new RemoveUIObjectCommand(card.container))
+            // Call the object's remove callback
+            contentObject.removeCallback(contentObject)
+        })
 
-            /**
-             * Add the card to the paginator.
-             */
-            paginator.addElement(card.container)
+        /**
+          * Add the card to GUI handler, so it can be accessed
+          * by GUI selection functions.
+          */
+        guiHandler.invoke(new AddUIObjectCommand(card.container))
 
-            /**
-             * Add the card to GUI handler, so it can be accessed
-             * by GUI selection functions.
-             */
-            guiHandler.invoke(new AddUIObjectCommand(card.container))
+        /**
+         * Add the card to the paginator.
+         */
+        paginator.addElement(card.container)
     })
 
     /**
@@ -211,8 +215,13 @@ export function buildContentPage() {
      */
     const contentObjects = () => contentManager.getContentObjects()
 
-    function addContentObject(contentObject) {
-        contentManager.addContentObject(contentObject)
+    function clearContentObjects() {
+        contentManager.clearContentObjects()
+        paginator.removeElements()
+    }
+
+    async function addContentObject(contentObject) {
+        await contentManager.addContentObject(contentObject)
     }
 
     function show() {
@@ -223,9 +232,11 @@ export function buildContentPage() {
         content.container.setVisibility(false)
     }
 
+
     return {
         contentObjects,
         addContentObject,
+        clearContentObjects,
         show,
         hide,
         checkoutButton,

@@ -15,6 +15,7 @@ import SetCheckoutUIInterfaceCommand from "../../../plugins/webxr/handlers/baske
 import { buildBasketUI } from "../../../plugins/webxr/handlers/basket/ui/checkout/main.js";
 import { buildQuantityUI } from "../../../plugins/webxr/handlers/basket/ui/quantity/main.js";
 import * as THREE from "three";
+import ContentObject from "../../../plugins/webxr/handlers/basket/ui/checkout/ContentObject.js";
 
 
 /**
@@ -30,6 +31,7 @@ class AddWebXRBasketCommand extends Command {
      * @param {Object} searchBasketMesh - The search for the object 3d.
      * @param {Object} searchPlaceholderMesh - The search for the placeholder object 3d.
      * @param {Object} searchPocketMesh - The search for the pocket object 3d.
+     * @param {string} id - The id for the selectable.
      * @param {THREE.Vector3} selectOffset - The offset for the controller select.
      * @param {THREE.Vector3} placeholderOffset - The offset for the placeholder object 3d.
      * @param {THREE.Vector3} pocketOffset - The offset for the insert area.
@@ -47,12 +49,14 @@ class AddWebXRBasketCommand extends Command {
         searchBasketMesh, 
         searchPlaceholderMesh, 
         searchPocketMesh,
+        id = 'basket',
         selectOffset = { x: 0, y: 0, z: 0 }, 
         placeholderOffset = { x: 0, y: 0, z: 0 },
         pocketOffset = { x: 0, y: 0, z: 0 },
         insertAreaOffset = { x: 0, y: 0, z: 0 },
         insertAreaSize = { x: 1, y: 1, z: 1 }) {
         super()
+        this.id = id
         this.searchBasketMesh = searchBasketMesh
         this.searchPlaceholderMesh = searchPlaceholderMesh
         this.searchPocketMesh = searchPocketMesh
@@ -89,6 +93,7 @@ class AddWebXRBasketCommand extends Command {
         const placeholderMesh = searchPlugin.search(this.searchPlaceholderMesh)
         const selectable = new SelectableBasket(
             basketMesh, 
+            this.id,
             placeholderMesh, 
             objectOffset, 
             placeholderOffset,
@@ -103,7 +108,7 @@ class AddWebXRBasketCommand extends Command {
          */
         const pocketMesh = searchPlugin.search(this.searchPocketMesh)
         const selectablePocketOffset = new THREE.Vector3(this.pocketOffset.x, this.pocketOffset.y, this.pocketOffset.z)
-        const selectablePocket = new SelectablePocket(pocketMesh, selectable)
+        const selectablePocket = new SelectablePocket(pocketMesh, this.id+'pk', selectable)
         await followHandler.invoke(new AddFollowObjectCommand(selectablePocket.mesh, selectablePocketOffset))
         await selectHandler.invoke(new AddSelectableCommand(selectablePocket))
         view.scene.add(selectablePocket.mesh)

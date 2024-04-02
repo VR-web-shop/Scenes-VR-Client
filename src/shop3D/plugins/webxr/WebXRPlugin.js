@@ -94,7 +94,8 @@ class WebXRPlugin extends Plugin {
         this.view = view
         this.button = (() => {
             const btn = VRButton.createButton(view.renderer)
-            document.body.appendChild(btn)
+            const wrapper = document.getElementById('vr-button')
+            wrapper.appendChild(btn)
             return btn
         })()
 

@@ -48,34 +48,6 @@ const decreaseButtonPosition = new THREE.Vector3(-0.15, 0.0, .0001)
 const confirmButtonPosition = new THREE.Vector3(0.15, -0.08, .0001)
 const cancelButtonPosition = new THREE.Vector3(-0.15, -0.08, .0001)
 
-/**
- * Events
- */
-const quantityDispatcher = new THREE.EventDispatcher()
-const EVENTS = { CONFIRM: 'confirm', CANCEL: 'cancel' }
-
-/**
- * @function addEventListener
- * @description Add an event listener.
- * @param {string} type - The event type. Possible values: 'cancel', 'confirm'.
- * @param {Function} listener - The event listener.
- * @returns {void}
- */
-function addEventListener(type, listener) {
-    quantityDispatcher.addEventListener(type, listener)
-}
-
-/**
- * @function removeEventListener
- * @description Remove an event listener.
- * @param {string} type - The event type. Possible values: 'cancel', 'confirm'.
- * @param {Function} listener - The event listener.
- * @returns {void}
- */
-function removeEventListener(type, listener) {
-    quantityDispatcher.removeEventListener(type, listener)
-}
-
 export async function buildQuantityUI() {
     const parent = new SpatialUI.SpatialUIBuilder()
         /**
@@ -141,13 +113,15 @@ export async function buildQuantityUI() {
     decreaseButton.addClickListener(quantityManager.decrease.bind(quantityManager))
     
     confirmButton.addClickListener(() => {
-        quantityDispatcher.dispatchEvent({ type: EVENTS.CONFIRM, quantityObject: quantityObject() })
-        hide()
+        const object = quantityObject()
+        object.onConfirmQuantity(object)
+        uiInterface.hide()
     })
 
     cancelButton.addClickListener(() => {
-        quantityDispatcher.dispatchEvent({ type: EVENTS.CANCEL, quantityObject: quantityObject() })
-        hide()
+        const object = quantityObject()
+        object.onCancelQuantity(object)
+        uiInterface.hide()
     })
 
     /**
@@ -164,8 +138,6 @@ export async function buildQuantityUI() {
      */
     const uiInterface = { 
         ...BaseUIInterface(parent),
-        addEventListener,
-        removeEventListener,
         setQuantityObject
     }
 

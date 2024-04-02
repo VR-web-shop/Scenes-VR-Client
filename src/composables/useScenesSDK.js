@@ -146,8 +146,8 @@ class WebXrUtils {
                     product_entity_state_name: 'AVAILABLE_FOR_PURCHASE'
                 }
             });
-
-            await shop.invoke(new AddWebXRSelectableCommand({ name: product.uuid }, product, productEntities));
+            console.log('Product entities', product);
+            await shop.invoke(new AddWebXRSelectableCommand({ name: product.uuid }, product.Product.uuid, product.Product, productEntities));
         }
 
         for (const checkout of checkouts) {
@@ -163,6 +163,7 @@ class WebXrUtils {
             { name: basket.uuid },
             { name: basket.uuid+'-ph' },
             { name: basket.uuid+'-pk' },
+            basket.uuid,
             basket.ObjectOffset,
             basket.PlaceholderOffset,
             basket.PocketOffset,

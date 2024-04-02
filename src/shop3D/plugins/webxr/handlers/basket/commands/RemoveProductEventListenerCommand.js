@@ -29,7 +29,7 @@ class RemoveProductEventListenerCommand extends WebXRHandlerCommand {
      * @returns {void}
      */
     async execute(options) {
-        options.checkoutProductsDispatcher.removeEventListener(this.type, this.callback)
+        options.removeEventListener(this.type, this.callback)
     }
 }
 

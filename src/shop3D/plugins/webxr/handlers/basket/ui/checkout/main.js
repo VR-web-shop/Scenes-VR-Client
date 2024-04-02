@@ -3,6 +3,7 @@ import BaseUIInterface from "../BaseUIInterface.js";
 import { buildCheckoutPage } from "./CheckoutPage.js"
 import { buildContentPage } from "./ContentPage.js"
 import * as THREE from 'three'
+import ContentObject from "./ContentObject.js"
 
 /**
  * General UI options
@@ -44,9 +45,13 @@ function removeEventListener(type, listener) {
  * @description Build the basket UI.
  * @returns {void}
  */
-export async function buildBasketUI() {
+export async function buildBasketUI(guiHandler) {
+    if (!guiHandler) {
+        throw new Error('The guiHandler must be defined')
+    }
+
     const checkout = buildCheckoutPage()
-    const content = buildContentPage()
+    const content = buildContentPage(guiHandler)
     const parent = new SpatialUI.SpatialUIBuilder()
         /**
          * Create the UI's background panel.
@@ -80,11 +85,15 @@ export async function buildBasketUI() {
         checkout.show()
     })
     content.cancelButton.addClickListener(() => {
-        parent.container.setVisbility(false)
+        parent.container.setVisibility(false)
     })
 
-    function addContentObject(contentObject) {
-        content.addContentObject(contentObject)
+    async function addContentObject(contentObject) {
+        await content.addContentObject(contentObject)
+    }
+
+    function clearContentObjects() {
+        content.clearContentObjects()
     }
 
     /**
@@ -94,7 +103,8 @@ export async function buildBasketUI() {
         ...BaseUIInterface(parent),
         addEventListener,
         removeEventListener,
-        addContentObject
+        addContentObject,
+        clearContentObjects
     }
 
     /**

@@ -9,13 +9,22 @@ const checkouts = [];
 /**
  * @property {CheckoutProduct[]} checkoutProducts - The checkout products.
  */
-const checkoutProducts = [];
+export const checkoutProducts = [];
 const checkoutProductsDispatcher = new THREE.EventDispatcher();
+function addEventListener(event, callback) {
+    checkoutProductsDispatcher.addEventListener(event, callback)
+}
+function removeEventListener(event, callback) {
+    checkoutProductsDispatcher.removeEventListener(event, callback)
+}
+function dispatchEvent(event, data) {
+    checkoutProductsDispatcher.dispatchEvent({ type: event, data })
+}
 
 /**
  * @property {Object} checkoutUI - The checkout UI.
  */
-let checkoutUI = null;
+export let checkoutUI = null;
 
 /**
  * @property {Object} quantityUI - The quantity UI.
@@ -45,7 +54,15 @@ class CheckoutHandler extends WebXRHandler {
     init(view, controllers) {
         this.view = view
         this.controllers = controllers
-        this.initInvoker({ checkouts, checkoutProducts, checkoutProductsDispatcher, checkoutUI, quantityUI })
+        this.initInvoker({ 
+            checkouts, 
+            checkoutProducts, 
+            addEventListener, 
+            removeEventListener,
+            dispatchEvent,
+            checkoutUI, 
+            quantityUI
+        })
     }
 
     /**

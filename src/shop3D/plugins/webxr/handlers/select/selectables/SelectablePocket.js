@@ -6,8 +6,8 @@ import Selectable from '../Selectable.js'
 let selectableBasket = null
 
 class SelectablePocket extends Selectable {
-    constructor(mesh, selectableChild) {
-        super(mesh)
+    constructor(mesh, id, selectableChild) {
+        super(mesh, id)
         this.selectableChild = selectableChild
         
         selectableBasket = this

@@ -40,7 +40,6 @@ class SpatialUIGrid extends SpatialUIElement {
                 const element = this.children[elementIndex];
                 const x = (j - this.columns / 2) * this.columnSpacing;
                 const y = (i - this.rows / 2) * this.rowSpacing;
-                
                 element.setPosition(new THREE.Vector3(x, y, 0));
                 elementIndex++;
             }

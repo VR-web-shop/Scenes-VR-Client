@@ -1,16 +1,20 @@
 
 export default class ContentManager {
-    constructor(onAddContentObject = ()=>{}) {
+    constructor(onAddContentObject = async ()=>{}) {
         this.contentObjects = []
         this.onAddContentObject = onAddContentObject
     }
 
-    addContentObject(contentObject) {
+    async addContentObject(contentObject) {
         this.contentObjects.push(contentObject)
-        this.onAddContentObject(contentObject)
+        await this.onAddContentObject(contentObject)
     }
 
     getContentObjects() {
         return this.contentObjects
+    }
+
+    clearContentObjects() {
+        this.contentObjects = []
     }
 }

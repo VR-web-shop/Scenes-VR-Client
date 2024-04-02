@@ -21,9 +21,10 @@ class AddWebXRSelectableCommand extends Command {
      * @example new AddWebXRSelectableCommand( { name: 'primitiveName' }, someProduct )
      * @example new AddWebXRSelectableCommand( { uuid: 'meshUUID' }, someProduct )
      */
-    constructor(search, product, productEntities) {
+    constructor(search, id, product, productEntities) {
         super()
         this.search = search
+        this.id = id
         this.product = product
         this.productEntities = productEntities
     }
@@ -38,8 +39,9 @@ class AddWebXRSelectableCommand extends Command {
         const searchPlugin = options.plugins.find('search')
         const webxrPlugin = options.plugins.find('webxr')
         const selectHandler = webxrPlugin.getHandler('select')
+        const checkoutHandler = webxrPlugin.getHandler('checkout')
         const mesh = searchPlugin.search(this.search)
-        const selectable = new SelectableProduct(mesh, this.product, this.productEntities)
+        const selectable = new SelectableProduct(mesh, this.id, this.product, this.productEntities, checkoutHandler)
 
         await selectHandler.invoke(new AddSelectableCommand(selectable))
     }

@@ -1,5 +1,4 @@
 import ContentObject from "./ui/checkout/ContentObject.js";
-import QuantityObject from "./ui/quantity/QuantityObject.js";
 
 export default class CheckoutProduct {
     constructor(selectableProduct) {
@@ -7,15 +6,11 @@ export default class CheckoutProduct {
     }
 
     getQuantity() {
-        return this.selectableProduct.getSelectedProductEntities().length
-    }
-
-    getMaxQuantity() {
-        return this.selectableProduct.getProductEntities().length
+        return this.selectableProduct.getProductEntitiesInUse().length
     }
 
     getPrice() {
-        return this.selectableProduct.getPrice() * this.quantity()
+        return this.selectableProduct.getPrice() * this.getQuantity()
     }
 
     getImageSource() {
@@ -23,7 +18,7 @@ export default class CheckoutProduct {
     }
 
     onRemoveFromBasket() {
-        this.selectableProduct.removeFromBasket()
+        this.selectableProduct.onRemoveFromBasket()
     }
     
     /**
@@ -33,20 +28,9 @@ export default class CheckoutProduct {
     toContentObject() {
         return new ContentObject(
             this.getImageSource(), 
-            this.getQuantity(), 
-            this.getPrice(), 
-            this.onRemoveFromBasket
-        )
-    }
-
-    /**
-     * Convert the product to a quantity object
-     * that can be displayed in the quantity UI.
-     */
-    toQuantityObject() {
-        return new QuantityObject(
-            this.getQuantity(), 
-            this.getMaxQuantity
+            this.getQuantity.bind(this), 
+            this.getPrice.bind(this), 
+            this.onRemoveFromBasket.bind(this)
         )
     }
 }

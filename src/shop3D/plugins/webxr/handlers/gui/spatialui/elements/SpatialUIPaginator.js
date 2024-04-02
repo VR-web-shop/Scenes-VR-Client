@@ -100,7 +100,7 @@ class SpatialUIPaginator extends SpatialUIElement {
 
     hideAllElements() {
         for (let i = 0; i < this.content.length; i++) {
-            this.content[i].setVisbility(false)
+            this.content[i].setVisibility(false)
         }
     }
 
@@ -116,14 +116,14 @@ class SpatialUIPaginator extends SpatialUIElement {
         const elements = []
         for (let i = start; i < end; i++) {
             if (i < this.content.length) {
-                this.content[i].setVisbility(true)
+                this.content[i].setVisibility(true)
                 elements.push(this.content[i])
             }
         }
         
         this.paginatableContainer.setElements(elements)
         this.paginatableContainer.arrangeElements() // Should ensure this container has an arrangeElements method
-        this.emptyText.setVisbility(elements.length === 0)
+        this.emptyText.setVisibility(elements.length === 0)
     }
 
     /**
@@ -135,6 +135,10 @@ class SpatialUIPaginator extends SpatialUIElement {
      * @override
      */
     addElement(spatialUIElement) {
+        if (!(spatialUIElement instanceof SpatialUIElement)) {
+            throw new Error('The spatialUIElement must be an instance of SpatialUIElement')
+        }
+
         this.content.push(spatialUIElement)
         this.showFirstPage()
     }

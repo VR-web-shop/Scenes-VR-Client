@@ -8,14 +8,14 @@ class AddProductEventListenerCommand extends WebXRHandlerCommand {
 
     /**
      * @constructor
-     * @param {string} type - The type of event: 'addProduct', 'removeProduct'
+     * @param {string} type - The type of event: 'addProduct', 'removeProduct', 'clearCart'.
      * @param {Function} callback - The callback for the event.
      */
     constructor(type, callback) {
         super()
         
-        if (type !== 'addProduct' && type !== 'removeProduct') {
-            throw new Error('The type must be either "addProduct" or "removeProduct"')
+        if (type !== 'addProduct' && type !== 'removeProduct' && type !== 'clearCart') {
+            throw new Error('The type must be either "addProduct" or "removeProduct or "clearCart"')
         }
 
         this.type = type
@@ -29,7 +29,7 @@ class AddProductEventListenerCommand extends WebXRHandlerCommand {
      * @returns {void}
      */
     async execute(options) {
-        options.checkoutProductsDispatcher.addEventListener(this.type, this.callback)
+        options.addEventListener(this.type, this.callback)
     }
 }
 

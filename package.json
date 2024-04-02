@@ -11,7 +11,7 @@
   "dependencies": {
     "@vr-web-shop/scenes": "1.0.40",
     "@vr-web-shop/auth": "1.0.38",
-    "@vr-web-shop/shopping-cart": "1.0.6",
+    "@vr-web-shop/shopping-cart": "1.0.9",
     "three": "^0.162.0",
     "vue": "^3.4.19",
     "vue-router": "^4.3.0"

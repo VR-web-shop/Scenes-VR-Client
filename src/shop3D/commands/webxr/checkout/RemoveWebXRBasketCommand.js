@@ -1,12 +1,12 @@
-import Command from "../../../../abstractions/commands/Command.js";
-import FindUIObjectByName from "../../../../plugins/webxr/handlers/gui/commands/FindUIObjectByName.js";
-import RemoveUIObjectCommand from "../../../../plugins/webxr/handlers/gui/commands/RemoveUIObjectCommand.js";
-import RemoveSelectableCommand from "../../../../plugins/webxr/handlers/select/commands/RemoveSelectableCommand.js";
+import Command from "../../../abstractions/commands/Command.js";
+import FindUIObjectByName from "../../../plugins/webxr/handlers/gui/commands/FindUIObjectByName.js";
+import RemoveUIObjectCommand from "../../../plugins/webxr/handlers/gui/commands/RemoveUIObjectCommand.js";
+import RemoveSelectableCommand from "../../../plugins/webxr/handlers/select/commands/RemoveSelectableCommand.js";
 
-import SetCheckoutUIInterfaceCommand from "../../../../plugins/webxr/handlers/basket/commands/SetCheckoutUIInterfaceCommand.js";
-import SetQuantityUIInterfaceCommand from "../../../../plugins/webxr/handlers/basket/commands/SetQuantityUIInterfaceCommand.js";
-import SelectableBasket from "../../../../plugins/webxr/handlers/select/selectables/SelectableBasket.js";
-import SelectablePocket from "../../../../plugins/webxr/handlers/select/selectables/SelectablePocket.js";
+import SetCheckoutUIInterfaceCommand from "../../../plugins/webxr/handlers/basket/commands/SetCheckoutUIInterfaceCommand.js";
+import SetQuantityUIInterfaceCommand from "../../../plugins/webxr/handlers/basket/commands/SetQuantityUIInterfaceCommand.js";
+import SelectableBasket from "../../../plugins/webxr/handlers/select/selectables/SelectableBasket.js";
+import SelectablePocket from "../../../plugins/webxr/handlers/select/selectables/SelectablePocket.js";
 
 /**
  * @class RemoveWebXRBasketCommand

@@ -1,4 +1,6 @@
 import Selectable from '../Selectable.js'
+import ShowCheckoutUICommand from '../../basket/commands/ShowCheckoutUICommand.js'
+import HideCheckoutUICommand from '../../basket/commands/HideCheckoutUICommand.js'
 import * as THREE from 'three'
 
 /**
@@ -7,8 +9,8 @@ import * as THREE from 'three'
 let selectableBasket = null
 
 class SelectableBasket extends Selectable {
-    constructor(mesh, placeholderMesh, selectOffset, placeholderOffset, insertAreaOffset, insertAreaSize, checkoutHandler) {
-        super(mesh)
+    constructor(mesh, id, placeholderMesh, selectOffset, placeholderOffset, insertAreaOffset, insertAreaSize, checkoutHandler) {
+        super(mesh, id)
         this.placeholderMesh = placeholderMesh
         this.checkoutHandler = checkoutHandler
         this.checkout = null
@@ -34,9 +36,10 @@ class SelectableBasket extends Selectable {
         this.uiInterface = uiInterface
     }
 
-    onSelect() {
+    async onSelect() {
         if (this.checkout) {
-            this.checkout.removeBasket()
+            await this.checkoutHandler.invoke(new HideCheckoutUICommand())
+            this.checkout = null
         }
 
         this.mesh.visible = true
@@ -45,12 +48,12 @@ class SelectableBasket extends Selectable {
         }
     }
 
-    onDeselect() {
+    async onDeselect() {
         const box = new THREE.Box3().setFromObject(this.mesh)
         const checkouts = this.checkoutHandler.getCheckouts()
         for (let i = 0; i < checkouts.length; i++) {
             if (checkouts[i].intersectsBox(box)) {
-                checkouts[i].addBasket(this)
+                await this.checkoutHandler.invoke(new ShowCheckoutUICommand(this, checkouts[i]))
                 return
             }
         }

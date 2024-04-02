@@ -93,7 +93,7 @@ export default class SpatialUIElement {
         if (!(spatialUIElement instanceof SpatialUIElement)) {
             throw new Error('The spatialUIElement must be an instance of SpatialUIElement');
         }
-
+        
         this.object3D.add(spatialUIElement.object3D);
         this.children.push(spatialUIElement);
     }
