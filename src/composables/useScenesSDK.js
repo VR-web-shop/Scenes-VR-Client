@@ -146,7 +146,6 @@ class WebXrUtils {
                     product_entity_state_name: 'AVAILABLE_FOR_PURCHASE'
                 }
             });
-            console.log('Product entities', product);
             await shop.invoke(new AddWebXRSelectableCommand({ name: product.uuid }, product.Product.uuid, product.Product, productEntities));
         }
 

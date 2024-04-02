@@ -14,6 +14,7 @@ export default class SocketMesh extends Socket {
         // Override the socket position to
         // use the mesh position
         this.position = mesh.position
+        this.rotation = mesh.rotation
     }
 
     intersect(selectables) {

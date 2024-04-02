@@ -1,6 +1,7 @@
 import WebXRHandlerCommand from "../../../abstractions/WebXRHandlerCommand.js";
 import SelectableBasket from "../../select/selectables/SelectableBasket.js";
 import Checkout from "../Checkout.js";
+import * as THREE from 'three'
 
 /**
  * @class ShowCheckoutUICommand
@@ -38,6 +39,7 @@ class ShowCheckoutUICommand extends WebXRHandlerCommand {
     async execute(options) {
         this.selectableBasket.checkout = this.checkout
         this.selectableBasket.mesh.position.copy(this.checkout.getCenterSurface())
+        this.selectableBasket.mesh.rotation.copy(new THREE.Euler(0, 0, 0))
         this.selectableBasket.mesh.visible = true
 
         options.checkoutUI.clearContentObjects()

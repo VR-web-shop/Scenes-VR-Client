@@ -15,6 +15,11 @@ class SelectableProduct extends Selectable {
         this.productEntitiesInUse = []
         this.checkoutHandler = checkoutHandler
         this.lastPosition = new THREE.Vector3().copy(mesh.position)
+        this.lastRotation = new THREE.Euler().copy(mesh.rotation)
+
+        if (this.productEntities.length === 0) {
+            this.mesh.visible = false
+        }
     }
 
     getPrice() {
@@ -183,6 +188,7 @@ class SelectableProduct extends Selectable {
         }
 
         this.mesh.position.copy(this.lastPosition)
+        this.mesh.rotation.copy(this.lastRotation)
     }
 
     isSelectable() {

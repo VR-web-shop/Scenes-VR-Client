@@ -16,7 +16,6 @@ class SelectableBasket extends Selectable {
         this.checkout = null
         
         this.insertArea = new InsertArea(this, insertAreaOffset, insertAreaSize)
-        this.inventory = new Inventory()
         
         this.mesh.visible = false
         this.placeholderMesh.visible = false
@@ -87,44 +86,6 @@ class InsertArea {
         const pos = new THREE.Vector3().copy(this.basketPosition).add(this.offset)
         const box3 = new THREE.Box3().setFromCenterAndSize(pos, this.size)
         return box.intersectsBox(box3)
-    }
-}
-
-class Inventory {
-    constructor() {
-        this.products = []
-        this.eventDispatcher = new THREE.EventDispatcher()
-        this.ui = null
-    }
-
-    addEventListener(type, callback) {
-        this.eventDispatcher.addEventListener(type, callback)
-    }
-
-    removeEventListener(type, callback) {
-        this.eventDispatcher.removeEventListener(type, callback)
-    }
-
-    setUI(ui) {
-        this.ui = ui
-    }
-
-    addProduct(product) {
-        this.products.push(product)
-        this.eventDispatcher.dispatchEvent({ type: 'addProduct', product })
-    }
-
-    removeProduct(product) {
-        const index = this.products.indexOf(product)
-        if (index !== -1) {
-            this.products.splice(index, 1)
-        }
-        this.eventDispatcher.dispatchEvent({ type: 'removeProduct', product })
-    }
-
-    clear() {
-        this.products = []
-        this.eventDispatcher.dispatchEvent({ type: 'clearProduct' })
     }
 }
 

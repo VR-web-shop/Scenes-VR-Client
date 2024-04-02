@@ -19,7 +19,11 @@ class Selectable {
     }
 
     setPosition(target) {
-        this.mesh.position.copy(target).add(this.selectOffset)
+        this.mesh.position.copy(target)
+    }
+
+    setRotation(rotation) {
+        this.mesh.rotation.copy(rotation)
     }
 
     select(socket) {

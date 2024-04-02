@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div v-if="checkoutCtrl.show.value" class="h-full w-full bg-white rounded-md shadow-md p-3 w-64 overflow-y-auto">
+        <div v-if="checkoutCtrl.show.value"
+            class="h-full w-full bg-white rounded-md shadow-md p-3 w-64 overflow-y-auto border border-gray-300">
             <h1 class="text-xl font-bold mb-1">
                 Checkout
             </h1>
@@ -9,138 +10,66 @@
                 Follow the instructions on the screen to complete your purchase.
             </p>
 
-            <div v-if="step === 'overview'">
-                <h2 class="text-md font-bold mb-1">
-                    Products
-                </h2>
-                <div v-if="checkoutCtrl.products.value.length > 0">
-                    <div class="border border-gray-300 p-3 rounded-md shadow-md" v-for="data in checkoutCtrl.products.value"
-                        :key="data.product.uuid">
-                        <div class="flex items-start gap-3 mb-3">
-                            <img :src="data.product.thumbnail_source" class="w-10 h-10 border border-gray-300 rounded-md" />
-                            <div>
-                                <div class="font-bold">{{ data.product.name }}</div>
-                                <div class="text-sm text-gray-500 mb-3">{{ data.product.description }}</div>
+            <div v-if="step === STEPS.overview">
+                <CheckoutProducts />
 
-                                <div class="text-xs text-center">
-                                    <div class="flex justify-center items-center gap-1">
-                                        <div class="font-bold">{{ data.product.price }}DKK</div>
-                                        <div class="font-bold">x</div>
-                                        <div class="font-bold">{{ data.entities.length }}</div>
-                                        <div class="font-bold">=</div>
-                                        <div class="font-bold">{{ data.product.price * data.entities.length }}DKK</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button @click="setStep('person')" class="bg-blue-500 text-white px-3 py-1 rounded-md mt-3 w-full">
+                <button @click="setStep(STEPS.person)" class="bg-blue-500 text-white px-3 py-1 rounded-md mt-3 w-full">
                     Personal Information
                 </button>
             </div>
 
-            <div v-if="step === 'person'">
-                <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3">
-                    <label class="block text-sm font-bold mb-1">Name</label>
-                    <input type="text" v-model="name" class="w-full border border-gray-300" />
-                </div>
-
-                <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3">
-                    <label class="block text-sm font-bold mb-1">Email</label>
-                    <input type="email" v-model="email" class="w-full border border-gray-300" />
-                </div>
-
-                <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3">
-                    <label class="block text-sm font-bold mb-1">Address</label>
-                    <input type="text" v-model="address" class="w-full border border-gray-300" />
-                </div>
-
-                <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3">
-                    <label class="block text-sm font-bold mb-1">City</label>
-                    <input type="text" v-model="city" class="w-full border border-gray-300" />
-                </div>
-
-                <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3">
-                    <label class="block text-sm font-bold mb-1">Country</label>
-                    <input type="text" v-model="country" class="w-full border border-gray-300" />
-                </div>
-
-                <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3">
-                    <label class="block text-sm font-bold mb-1">Postal Code</label>
-                    <input type="text" v-model="postalCode" class="w-full border border-gray-300" />
-                </div>
-
-                <div class="flex justify-between gap-3">
-                    <button @click="setStep('overview')" class="bg-gray-500 text-white px-3 py-1 rounded-md mt-3 w-full">
-                        Back
-                    </button>
-
-                    <button @click="submitPersonalInformation()"
-                        class="bg-blue-500 text-white px-3 py-1 rounded-md mt-3 w-full">
-                        Delivery Option
-                    </button>
-                </div>
+            <div v-else-if="step === STEPS.person">
+                <ProductOrderPerson
+                    :lastStep="() => setStep(STEPS.overview)"
+                    :nextStep="submitPersonalInformation"
+                />
             </div>
 
-            <div v-if="step === 'delivery'">
-                <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3" v-for="option in deliveryOptions"
-                    :key="option.name">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <div class="font-bold">{{ option.name }}</div>
-                            <div class="text-gray-500">Price: {{ option.price }}</div>
-                        </div>
-                        <div>
-                            <input type="radio" v-model="deliveryOption" :value="option.name" />
-                        </div>
+            <div v-else-if="step === STEPS.delivery">
+                <ProductOrderDelivery
+                    :lastStep="() => setStep(STEPS.person)"
+                    :nextStep="submitDeliveryOption"
+                />
+            </div>
+
+            <div v-else-if="step === STEPS.payment">
+                <ProductOrderPayment
+                    :lastStep="() => setStep(STEPS.delivery)"
+                    :nextStep="submitPaymentMethod"
+                />
+            </div>
+
+            <div v-else-if="step === STEPS.order_overview">
+                <div v-if="productOrder">
+                    <ProductOrderOverview />
+
+                    <div class="flex justify-between gap-3">
+                        <button @click="setStep(STEPS.person)" class="bg-gray-500 text-white px-3 py-1 rounded-md mt-3 w-full">
+                            Edit Order
+                        </button>
+
+                        <button @click="goToPayment()" class="bg-green-500 text-white px-3 py-1 rounded-md mt-3 w-full">
+                            Go to payment
+                        </button>
                     </div>
                 </div>
-
-                <div class="flex justify-between gap-3">
-                    <button @click="setStep('person')" class="bg-gray-500 text-white px-3 py-1 rounded-md mt-3 w-full">
-                        Back
-                    </button>
-
-                    <button @click="submitDeliveryOption()" class="bg-blue-500 text-white px-3 py-1 rounded-md mt-3 w-full">
-                        Payment Method
-                    </button>
+                <div v-else class="border border-gray-300 p-3 rounded-md shadow-md mt-3">
+                    Creating your order...
                 </div>
             </div>
 
-            <div v-if="step === 'payment'">
-                <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3" v-for="method in paymentMethods"
-                    :key="method.name">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <div class="font-bold">{{ method.name }}</div>
-                            <div class="text-gray-500">Price: {{ method.price }}</div>
-                        </div>
-                        <div>
-                            <input type="radio" v-model="paymentMethod" :value="method.name" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-between gap-3">
-                    <button @click="setStep('delivery')" class="bg-gray-500 text-white px-3 py-1 rounded-md mt-3 w-full">
-                        Back
-                    </button>
-
-                    <button @click="submitPaymentMethod()" class="bg-blue-500 text-white px-3 py-1 rounded-md mt-3 w-full">
-                        Complete Purchase
-                    </button>
-                </div>
+            <div v-else-if="step === STEPS.card_information">
+                <ProductOrderCredit 
+                    :lastStep="() => setStep(STEPS.order_overview)"
+                    :nextStep="showSuccess"
+                />
             </div>
 
-            <div v-if="step === 'complete'">
-                <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3">
-                    Processing your purchase...
-                </div>
+            <div v-else-if="step === STEPS.checkout_success">
+                <ProductOrderComplete />
             </div>
 
-            <button @click="cancelPurchase()" class="bg-red-500 text-white px-3 py-1 rounded-md mt-3 w-full">
+            <button v-if="step !== STEPS.checkout_success" @click="cancelPurchase()" class="bg-red-500 text-white px-3 py-1 rounded-md mt-3 w-full">
                 Cancel Purchase
             </button>
         </div>
@@ -148,107 +77,81 @@
 </template>
 
 <script setup>
+import CheckoutProducts from './checkout/CheckoutProducts.vue';
+import ProductOrderCredit from './checkout/ProductOrderCredit.vue';
+import ProductOrderOverview from './checkout/ProductOrderOverview.vue';
+import ProductOrderPerson from './checkout/ProductOrderPerson.vue';
+import ProductOrderPayment from './checkout/ProductOrderPayment.vue';
+import ProductOrderDelivery from './checkout/ProductOrderDelivery.vue';
+import ProductOrderComplete from './checkout/ProductOrderComplete.vue';
 import { useCheckout } from '../composables/useCheckout.js';
 import { useShoppingCartSDK } from '../composables/useShoppingCartSDK';
 import { useToast } from '../composables/useToast.js';
-import { ref, computed, onBeforeMount } from 'vue'
+import { ref, toRaw, computed, onBeforeMount } from 'vue'
+
+const STEPS = {
+    overview: 'overview',
+    person: 'person',
+    delivery: 'delivery',
+    payment: 'payment',
+    order_overview: 'order_overview',
+    card_information: 'card_information',
+    checkout_success: 'checkout_success'
+}
+
+const step = ref(STEPS.overview)
+const setStep = (newStep) => {
+    step.value = newStep
+}
 
 const checkoutCtrl = useCheckout()
 const shoppingCartCtrl = useShoppingCartSDK()
 const toastCtrl = useToast()
-const step = ref('overview')
-const setStep = (newStep) => {
-    step.value = newStep
-}
-const deliveryOptions = ref([
-    { name: 'Standard Delivery', price: 5 },
-    { name: 'Express Delivery', price: 10 },
-    { name: 'Pickup', price: 0 }
-])
+const productOrder = computed(() => checkoutCtrl.productOrder.value)
 
-const paymentMethods = ref([
-    { name: 'Credit Card', price: 0 },
-    { name: 'PayPal', price: 0 },
-    { name: 'Bank Transfer', price: 0 }
-])
+const params = ref({})
 
-const name = ref('')
-const email = ref('')
-const address = ref('')
-const city = ref('')
-const country = ref('')
-const postalCode = ref('')
-
-const deliveryOption = ref('')
-const paymentMethod = ref('')
-
-const submitPersonalInformation = () => {
-
-    if (!name.value) {
-        toastCtrl.add('Name is required', 5000, 'error')
-        return
+const submitPersonalInformation = (personalParams) => {
+    params.value = {
+        ...params.value,
+        ...personalParams
     }
 
-    if (!email.value) {
-        toastCtrl.add('Email is required', 5000, 'error')
-        return
-    }
-
-    if (!address.value) {
-        toastCtrl.add('Address is required', 5000, 'error')
-        return
-    }
-
-    if (!city.value) {
-        toastCtrl.add('City is required', 5000, 'error')
-        return
-    }
-
-    if (!country.value) {
-        toastCtrl.add('Country is required', 5000, 'error')
-        return
-    }
-
-    if (!postalCode.value) {
-        toastCtrl.add('Postal Code is required', 5000, 'error')
-        return
-    }
-
-    setStep('delivery')
+    setStep(STEPS.delivery)
 }
 
-const submitDeliveryOption = () => {
-
-    if (!deliveryOption.value) {
-        toastCtrl.add('Delivery option is required', 5000, 'error')
-        return
+const submitDeliveryOption = (deliverOptionParams) => {
+    params.value = {
+        ...params.value,
+        ...deliverOptionParams
     }
 
-    setStep('payment')
+    setStep(STEPS.payment)
 }
 
-const submitPaymentMethod = async () => {
-
-    if (!paymentMethod.value) {
-        toastCtrl.add('Payment method is required', 5000, 'error')
-        return
+const submitPaymentMethod = async (paymentOptionsParams) => {
+    const cart = await shoppingCartCtrl.createOrFindCart();
+    const req = {
+        cart_uuid: cart.uuid,
+        ...toRaw(params.value),
+        ...toRaw(paymentOptionsParams),
+        responseInclude: [
+            { model: 'ProductOrderState' },
+            { model: 'DeliverOption' },
+            { model: 'PaymentOption' }
+        ]
     }
 
-    const params = {
-        cart_uuid: shoppingCartCtrl.cart.value.uuid,
-        name: name.value,
-        email: email.value,
-        address: address.value,
-        city: city.value,
-        country: country.value,
-        postalCode: postalCode.value,
-        deliveryOption: deliveryOption.value,
-        paymentMethod: paymentMethod.value
+    let order;
+    if (productOrder.value) {
+        req.uuid = productOrder.value.uuid
+        order = await shoppingCartCtrl.sdk.api.ProductOrderController.update(req)
+    } else {
+        order = await shoppingCartCtrl.sdk.api.ProductOrderController.create(req)
     }
-
-    const order = shoppingCartCtrl.sdk.api.ProductOrderController.create(params)
-
-    setStep('complete')
+    
+    checkoutCtrl.setProductOrder(order)
+    setStep(STEPS.order_overview)
 }
 
 const cancelPurchase = async () => {
@@ -256,7 +159,33 @@ const cancelPurchase = async () => {
     toastCtrl.add('Purchase cancelled', 5000, 'success')
 }
 
+const goToPayment = () => {
+    if (productOrder.value.PaymentOption.name === 'Credit Card') {
+        setStep(STEPS.card_information)      
+    } else {
+        showSuccess()
+    }
+}
+
+const showSuccess = async () => {
+    setStep(STEPS.checkout_success)
+    toastCtrl.add('Purchase completed', 5000, 'success')
+
+    const r = await shoppingCartCtrl.sdk.api.ProductOrderController.update({
+        uuid: productOrder.value.uuid,
+        product_order_state_name: 'WAITING_FOR_SHIPMENT'
+    })
+
+    setTimeout(() => {
+        location.reload()
+    }, 15000)
+}
+
 onBeforeMount(async () => {
     await checkoutCtrl.reloadCheckout()
+
+    if (productOrder.value) {
+        setStep(STEPS.order_overview)
+    }
 })
 </script>

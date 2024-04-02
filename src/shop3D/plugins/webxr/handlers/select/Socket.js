@@ -6,6 +6,7 @@ export default class Socket {
         this.selected = null
         this.selectOffset = new THREE.Vector3()
         this.position = new THREE.Vector3()
+        this.rotation = new THREE.Euler()
     }
 
     setPosition(position) {
@@ -20,11 +21,12 @@ export default class Socket {
 
     updateSelectedPosition() {
         if (this.selected) {
-            const nextPosition = new THREE.Vector3()
-                .copy(this.position)
-                .sub(this.selectOffset)
+            const handRotation = this.rotation.clone()
+            const nextPosition = this.position.clone()
+                .add(this.selected.selectOffset.clone().applyEuler(handRotation));
 
-            this.selected.setPosition(nextPosition)
+            this.selected.setRotation(handRotation);
+            this.selected.setPosition(nextPosition);
         }
     }
 
