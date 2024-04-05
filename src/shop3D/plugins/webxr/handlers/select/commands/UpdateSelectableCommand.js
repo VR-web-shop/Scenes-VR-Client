@@ -40,8 +40,6 @@ class UpdateSelectableCommand extends WebXRHandlerCommand {
                 return
             }
         }
-
-        throw new Error(`The selectable with id ${this.id} does not exist`)
     }
 }
 

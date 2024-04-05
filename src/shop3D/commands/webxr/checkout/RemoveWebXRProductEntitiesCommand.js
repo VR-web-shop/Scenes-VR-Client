@@ -2,19 +2,20 @@ import Command from "../../../abstractions/commands/Command.js";
 import UpdateSelectableCommand from "../../../plugins/webxr/handlers/select/commands/UpdateSelectableCommand.js";
 
 /**
- * @class AddWebXRReservedProductEntitiesCommand
- * @classdesc Command for adding reserved product entities.
+ * @class RemoveWebXRProductEntitiesCommand
+ * @classdesc Command for removing product entities.
  * @extends Command
  * @property options - The options for the command.
  */
-class AddWebXRReservedProductEntitiesCommand extends Command {
+class RemoveWebXRProductEntitiesCommand extends Command {
 
     /**
      * @constructor
      * @param {string} id - The id for the product.
      * @param {Object[]} productEntities - The product entities.
+     * @param {boolean} blockIfReserved - The block if reserved flag.
      */
-    constructor(id, productEntities) {
+    constructor(id, productEntities, blockIfReserved=false) {
         super()
 
         if (typeof id !== 'string') {
@@ -25,8 +26,13 @@ class AddWebXRReservedProductEntitiesCommand extends Command {
             throw new Error('The productEntities must be an array')
         }
 
+        if (typeof blockIfReserved !== 'boolean') {
+            throw new Error('The blockIfReserved must be a boolean')
+        }
+
         this.id = id
         this.productEntities = productEntities
+        this.blockIfReserved = blockIfReserved
     }
 
     /**
@@ -45,10 +51,11 @@ class AddWebXRReservedProductEntitiesCommand extends Command {
          * with the unknown product entities.
          */
         await selectHandler.invoke(new UpdateSelectableCommand(this.id, {
-            addProductEntities: this.productEntities,
-            reserveProductEntities: this.productEntities
+            removeProductEntity: this.productEntities,
+            releaseReservedProductEntities: this.productEntities,
+            blockIfReserved: this.blockIfReserved
         }))
     }
 }
 
-export default AddWebXRReservedProductEntitiesCommand
+export default RemoveWebXRProductEntitiesCommand

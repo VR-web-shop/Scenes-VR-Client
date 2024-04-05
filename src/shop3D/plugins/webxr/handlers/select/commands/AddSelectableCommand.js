@@ -29,6 +29,16 @@ class AddSelectableCommand extends WebXRHandlerCommand {
      * @async
      */
     async execute(options) {
+        /**
+         * If the product exists in the selectables,
+         * we don't need to add it again.
+         */
+        for (let i = 0; i < options.selectables.length; i++) {
+            if (options.selectables[i].id === this.selectable.id) {
+                return
+            }
+        }
+
         options.selectables.push(this.selectable);
     }
 }

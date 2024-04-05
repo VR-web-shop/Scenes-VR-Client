@@ -50,6 +50,7 @@ class ShowCheckoutUICommand extends WebXRHandlerCommand {
         
         options.checkoutUI.setPosition(this.checkout.getUIPosition())
         options.checkoutUI.setRotation(this.checkout.getUIEulerRotation())
+        options.checkoutUI.setScale(this.checkout.getUIScale())
         options.checkoutUI.show()
     }
 }

@@ -1,20 +1,19 @@
 <template>
     <div>
-        <div class="flex gap-3 fixed top-3 left-3 bottom-3 overflow-y-auto">
-            <StartVROverlayVue />
-            <CheckoutOverlay />
-            
-        </div>
+        <CheckoutOverlay />
+        <StartVROverlayVue />
 
         <canvas ref="canvasRef" v-show="shop.isRunning" />
         <div v-if="isInitializing">Initializing...</div>
         <div v-if="isStopped">Stopped...</div>
+        <HomeDetails />
     </div>
 </template>
 
 <script setup>
 import CheckoutOverlay from '../components/CheckoutOverlay.vue';
 import StartVROverlayVue from '../components/StartVROverlay.vue';
+import HomeDetails from '../components/HomeDetails.vue';
 import { useShop } from '../composables/useShop.js';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 

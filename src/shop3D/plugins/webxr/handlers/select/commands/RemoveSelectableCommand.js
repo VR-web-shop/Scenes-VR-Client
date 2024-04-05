@@ -1,5 +1,4 @@
 import WebXRHandlerCommand from "../../../abstractions/WebXRHandlerCommand.js";
-import * as THREE from 'three'
 
 /**
  * @class RemoveSelectableCommand
@@ -9,16 +8,16 @@ class RemoveSelectableCommand extends WebXRHandlerCommand {
 
     /**
      * @constructor
-     * @param {THREE.Object3D} object3D - The selectable's object3D.
+     * @param {string} id - The id for the selectable.
      */
-    constructor(object3D) {
+    constructor(id) {
         super()
 
-        if (!(object3D instanceof THREE.Object3D)) {
-            throw new Error('The object must be an instance of THREE.Object3D')
+        if (typeof id !== 'string') {
+            throw new Error('The id must be a string')
         }
 
-        this.object3D = object3D
+        this.id = id
     }
 
     /**
@@ -31,7 +30,7 @@ class RemoveSelectableCommand extends WebXRHandlerCommand {
     async execute(options) {
         const selectables = options.selectables
         for (let i = 0; i < selectables.length; i++) {
-            if (selectables[i].mesh.uuid === this.object3D.uuid) {
+            if (selectables[i].id === this.id) {
                 selectables.splice(i, 1)
                 break
             }

@@ -29,8 +29,8 @@ class RemoveCheckoutEventListenerCommand extends WebXRHandlerCommand {
      * @returns {void}
      */
     async execute(options) {
-        if (options.checkoutUI === undefined) {
-            throw new Error('Set a checkoutUI by the SetCheckoutUIInterfaceCommand before adding a listener')
+        if (!options.checkoutUI) {
+            return
         }
 
         options.checkoutUI.removeEventListener(this.type, this.callback)

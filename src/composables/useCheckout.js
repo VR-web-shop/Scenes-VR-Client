@@ -9,7 +9,6 @@ const products = ref([])
 const productOrder = ref(null)
 const deliveryOptions = ref([])
 const paymentOptions = ref([])
-const valuta = ref('DKK')
 
 const show = computed(()=>cart.value && cart.value.cart_state_name === 'WAITING_FOR_CHECKOUT')
 
@@ -102,6 +101,5 @@ export const useCheckout = () => {
         show,
         reloadCheckout,
         setProductOrder,
-        valuta
     }
 }

@@ -45,6 +45,16 @@ export default (parent) => {
     }
 
     /**
+     * @function setScale
+     * @description Set the scale of the UI.
+     * @param {THREE.Vector3}
+     * @returns {void}
+     */
+    function setScale(scale) {
+        parent.container.setScale(scale)
+    }
+
+    /**
      * @function lookAt
      * @description Look at a position.
      * @param {THREE.Vector3}
@@ -59,6 +69,7 @@ export default (parent) => {
         hide,
         setPosition,
         setRotation,
+        setScale,
         lookAt
     }
 }

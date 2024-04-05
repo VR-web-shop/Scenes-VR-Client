@@ -63,7 +63,6 @@ export function useShoppingCartSDK() {
         await shop.invoke(new AddWebXRCheckoutListenerCommand('cancelCheckout', cancelCheckout.bind(this)))
         await shop.invoke(new AddWebXRAddProductListenerCommand('addProduct', addProductToCart.bind(this)))
         await shop.invoke(new AddWebXRAddProductListenerCommand('removeProduct', removeProductFromCart.bind(this)))
-        await shop.invoke(new AddWebXRAddProductListenerCommand('clearCart', clearCart.bind(this)))
         await loadCart(shop)
     }
 
@@ -76,7 +75,6 @@ export function useShoppingCartSDK() {
         await shop.invoke(new RemoveWebXRCheckoutListenerCommand('cancelCheckout', cancelCheckout.bind(this)))
         await shop.invoke(new RemoveWebXRAddProductListenerCommand('addProduct', addProductToCart.bind(this)))
         await shop.invoke(new RemoveWebXRAddProductListenerCommand('removeProduct', removeProductFromCart.bind(this)))
-        await shop.invoke(new RemoveWebXRAddProductListenerCommand('clearCart', clearCart.bind(this)))
     }
 
     async function loadCart(shop) {
@@ -89,7 +87,7 @@ export function useShoppingCartSDK() {
                     where: {uuid: productEntity.uuid},
                     include: [{model: 'Product'}]
                 })
-                
+                console.log('rows', rows)
                 await shop.invoke(new AddWebXRReservedProductEntitiesCommand(rows[0].Product.uuid, [toRaw(productEntity)]))
             }
         }

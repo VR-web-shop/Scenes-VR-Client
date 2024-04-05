@@ -46,10 +46,25 @@ export default class SpatialUIElement {
      * @description Set the rotation of the spatial UI.
      * @param {THREE.Quaternion} rotation - The rotation.
      * @returns {void}
-     * @throws {Error} The rotation must be an instance of THREE.Quaternion.
+     * @throws {Error} The rotation must be an instance of THREE.Euler.
      */
     setRotation(rotation) {
         this.object3D.rotation.copy(rotation);
+    }
+
+    /**
+     * @function setScale
+     * @description Set the scale of the spatial UI.
+     * @param {THREE.Vector3} scale - The scale.
+     * @returns {void}
+     * @throws {Error} The scale must be an instance of THREE.Vector3.
+     */
+    setScale(scale) {
+        if (!(scale instanceof THREE.Vector3)) {
+            throw new Error('The scale must be an instance of THREE.Vector3');
+        }
+
+        this.object3D.scale.copy(scale);
     }
 
     /**

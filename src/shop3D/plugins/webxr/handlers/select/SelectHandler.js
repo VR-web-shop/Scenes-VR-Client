@@ -87,8 +87,8 @@ class SelectHandler extends WebXRHandler {
             const controllerSocket = controllerSockets[i]
             const controller = controllerSocket.controller
 
-            controller.removeEventListener('squeezestart', select)
-            controller.removeEventListener('squeezeend', deselect)
+            controller?.removeEventListener('squeezestart', select)
+            controller?.removeEventListener('squeezeend', deselect)
         }
 
         selectables.length = 0

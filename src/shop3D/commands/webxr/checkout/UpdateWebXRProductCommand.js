@@ -2,31 +2,31 @@ import Command from "../../../abstractions/commands/Command.js";
 import UpdateSelectableCommand from "../../../plugins/webxr/handlers/select/commands/UpdateSelectableCommand.js";
 
 /**
- * @class AddWebXRReservedProductEntitiesCommand
- * @classdesc Command for adding reserved product entities.
+ * @class UpdateWebXRProductCommand
+ * @classdesc Command for updating a product.
  * @extends Command
  * @property options - The options for the command.
  */
-class AddWebXRReservedProductEntitiesCommand extends Command {
+class UpdateWebXRProductCommand extends Command {
 
     /**
      * @constructor
      * @param {string} id - The id for the product.
-     * @param {Object[]} productEntities - The product entities.
+     * @param {Object} product - The product.
      */
-    constructor(id, productEntities) {
+    constructor(id, product) {
         super()
 
         if (typeof id !== 'string') {
             throw new Error('The id must be a string')
         }
 
-        if (!Array.isArray(productEntities)) {
-            throw new Error('The productEntities must be an array')
+        if (typeof product !== 'object') {
+            throw new Error('The product must be an object')
         }
 
         this.id = id
-        this.productEntities = productEntities
+        this.product = product
     }
 
     /**
@@ -45,10 +45,9 @@ class AddWebXRReservedProductEntitiesCommand extends Command {
          * with the unknown product entities.
          */
         await selectHandler.invoke(new UpdateSelectableCommand(this.id, {
-            addProductEntities: this.productEntities,
-            reserveProductEntities: this.productEntities
+            updateProduct: this.product,
         }))
     }
 }
 
-export default AddWebXRReservedProductEntitiesCommand
+export default UpdateWebXRProductCommand

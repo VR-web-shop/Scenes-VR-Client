@@ -15,8 +15,9 @@ class AddCheckoutCommand extends WebXRHandlerCommand {
      * @param {THREE.Vector3} surfaceSize - The size for the surface.
      * @param {THREE.Vector3} UIOffset - The UI offset.
      * @param {THREE.Euler} UIRotation - The UI rotation.
+     * @param {THREE.Vector3} UIScale - The UI scale.
      */
-    constructor(object3D, surfaceOffset, surfaceSize, UIOffset, UIRotation) {
+    constructor(object3D, surfaceOffset, surfaceSize, UIOffset, UIRotation, UIScale) {
         super()
 
         if (!(object3D instanceof THREE.Object3D)) {
@@ -39,11 +40,16 @@ class AddCheckoutCommand extends WebXRHandlerCommand {
             throw new Error('The UIRotation must be an instance of THREE.Euler')
         }
 
+        if (!(UIScale instanceof THREE.Vector3)) {
+            throw new Error('The UIScale must be an instance of THREE.Vector3')
+        }
+
         this.object3D = object3D
         this.surfaceOffset = surfaceOffset
         this.surfaceSize = surfaceSize
         this.UIOffset = UIOffset
         this.UIRotation = UIRotation
+        this.UIScale = UIScale
     }
 
     /**
@@ -59,7 +65,8 @@ class AddCheckoutCommand extends WebXRHandlerCommand {
             this.surfaceOffset, 
             this.surfaceSize, 
             this.UIOffset, 
-            this.UIRotation
+            this.UIRotation,
+            this.UIScale
         ));
     }
 }

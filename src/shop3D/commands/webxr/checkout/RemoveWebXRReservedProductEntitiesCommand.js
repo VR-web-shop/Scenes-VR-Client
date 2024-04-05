@@ -2,12 +2,12 @@ import Command from "../../../abstractions/commands/Command.js";
 import UpdateSelectableCommand from "../../../plugins/webxr/handlers/select/commands/UpdateSelectableCommand.js";
 
 /**
- * @class AddWebXRReservedProductEntitiesCommand
- * @classdesc Command for adding reserved product entities.
+ * @class RemoveWebXRReservedProductEntitiesCommand
+ * @classdesc Command for removing reserved product entities.
  * @extends Command
  * @property options - The options for the command.
  */
-class AddWebXRReservedProductEntitiesCommand extends Command {
+class RemoveWebXRReservedProductEntitiesCommand extends Command {
 
     /**
      * @constructor
@@ -45,10 +45,9 @@ class AddWebXRReservedProductEntitiesCommand extends Command {
          * with the unknown product entities.
          */
         await selectHandler.invoke(new UpdateSelectableCommand(this.id, {
-            addProductEntities: this.productEntities,
-            reserveProductEntities: this.productEntities
+            releaseReservedProductEntities: this.productEntities
         }))
     }
 }
 
-export default AddWebXRReservedProductEntitiesCommand
+export default RemoveWebXRReservedProductEntitiesCommand

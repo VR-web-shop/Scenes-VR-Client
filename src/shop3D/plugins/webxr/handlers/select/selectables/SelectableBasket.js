@@ -42,9 +42,6 @@ class SelectableBasket extends Selectable {
         }
 
         this.mesh.visible = true
-        if (this.inventory.products.length > 0) {
-            this.placeholderMesh.visible = true
-        }
     }
 
     async onDeselect() {

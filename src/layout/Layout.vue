@@ -1,5 +1,6 @@
 <script setup>
 import Toast from '../components/Toast.vue';
+import Footer from './Footer.vue';
 </script>
 
 <template>
@@ -7,5 +8,6 @@ import Toast from '../components/Toast.vue';
       <Toast />
       
       <router-view></router-view>
+      <Footer />
     </div>
 </template>

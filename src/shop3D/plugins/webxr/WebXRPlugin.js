@@ -94,8 +94,6 @@ class WebXRPlugin extends Plugin {
         this.view = view
         this.button = (() => {
             const btn = VRButton.createButton(view.renderer)
-            const wrapper = document.getElementById('vr-button')
-            wrapper.appendChild(btn)
             return btn
         })()
 
@@ -123,6 +121,10 @@ class WebXRPlugin extends Plugin {
      */
     getHandler(name) {
         return handlers[name]
+    }
+
+    toggleVRMode() {
+        this.button.click()
     }
 }
 

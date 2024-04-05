@@ -5,7 +5,7 @@
             <div class="flex items-center justify-between gap-3">
                 <div>
                     <div class="font-bold">{{ option.name }}</div>
-                    <div class="text-gray-500">Price: {{ option.price }}</div>
+                    <div class="text-gray-500">Price: {{ option.price }} {{ valuta }}</div>
                 </div>
                 <div>
                     <input type="radio" v-model="deliveryOption" :value="option.name" />
@@ -26,12 +26,14 @@
 </template>
 
 <script setup>
+import { useProductsSDK } from '../../composables/useProductsSDK.js';
 import { useToast } from '../../composables/useToast.js';
 import { useCheckout } from '../../composables/useCheckout.js';
 import { ref, computed, onBeforeMount } from 'vue'
 
 const toastCtrl = useToast()
 const checkoutCtrl = useCheckout()
+const productsSDK = useProductsSDK()
 
 const props = defineProps({
     lastStep: {
@@ -43,6 +45,8 @@ const props = defineProps({
         required: true
     },
 })
+
+const valuta = computed(() => productsSDK.valuta.value?.short)
 
 const deliveryOptions = computed(() => checkoutCtrl.deliveryOptions.value)
 const productOrder = computed(() => checkoutCtrl.productOrder.value)

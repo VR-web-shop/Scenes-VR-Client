@@ -41,7 +41,7 @@
                 <p class="font-bold">Delivery Option:</p>
                 <div class="text-right">
                     <p>{{ productOrder.DeliverOption.name }}</p>
-                    <p>{{ productOrder.DeliverOption.price }}DKK</p>
+                    <p>{{ productOrder.DeliverOption.price }}{{ valuta }}</p>
                 </div>
             </div>
         </div>
@@ -53,7 +53,7 @@
                 <p class="font-bold">Payment Option:</p>
                 <div class="text-right">
                     <p>{{ productOrder.PaymentOption.name }}</p>
-                    <p>{{ productOrder.PaymentOption.price }}DKK</p>
+                    <p>{{ productOrder.PaymentOption.price }}{{ valuta }}</p>
                 </div>
             </div>
         </div>
@@ -71,11 +71,13 @@
 
 <script setup>
 import CheckoutProducts from './CheckoutProducts.vue';
+import { useProductsSDK } from '../../composables/useProductsSDK.js';
 import { useCheckout } from '../../composables/useCheckout.js';
 import { computed } from 'vue'
 
+const productsCtrl = useProductsSDK()
 const checkoutCtrl = useCheckout()
-const valuta = computed(() => checkoutCtrl.valuta.value)
+const valuta = computed(() => productsCtrl.valuta.value?.short)
 const productOrder = computed(() => checkoutCtrl.productOrder.value)
 const deliveryOptions = computed(() => checkoutCtrl.deliveryOptions.value)
 const paymentOptions = computed(() => checkoutCtrl.paymentOptions.value)

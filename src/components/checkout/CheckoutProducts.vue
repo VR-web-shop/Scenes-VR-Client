@@ -29,9 +29,11 @@
 </template>
 
 <script setup>
+import { useProductsSDK } from '../../composables/useProductsSDK.js';
 import { useCheckout } from '../../composables/useCheckout.js';
 import { computed } from 'vue'
 
 const checkoutCtrl = useCheckout()
-const valuta = computed(() => checkoutCtrl.valuta.value)
+const productsSDK = useProductsSDK()
+const valuta = computed(() => productsSDK.valuta.value?.short)
 </script>

@@ -27,13 +27,15 @@ class AddWebXRCheckoutCommand extends Command {
         surfaceOffset = {x: 0, y: 0, z: 0}, 
         surfaceSize = {x: 1, y: 1, z: 1},
         UIOffset = {x: 0, y: 0, z: 0},
-        UIRotation = {x: 0, y: 0, z: 0}) {
+        UIRotation = {x: 0, y: 0, z: 0},
+        UIScale = {x: 1, y: 1, z: 1}) {
         super()
         this.search = search
         this.surfaceOffset = surfaceOffset
         this.surfaceSize = surfaceSize
         this.UIOffset = UIOffset
         this.UIRotation = UIRotation
+        this.UIScale = UIScale
     }
 
     /**
@@ -47,13 +49,14 @@ class AddWebXRCheckoutCommand extends Command {
         const size = new THREE.Vector3(this.surfaceSize.x, this.surfaceSize.y, this.surfaceSize.z)
         const UIOffset = new THREE.Vector3(this.UIOffset.x, this.UIOffset.y, this.UIOffset.z)
         const UIRotation = new THREE.Euler(this.UIRotation.x, this.UIRotation.y, this.UIRotation.z)
+        const UIScale = new THREE.Vector3(this.UIScale.x, this.UIScale.y, this.UIScale.z)
         
         const searchPlugin = options.plugins.find('search')
         const webxrPlugin = options.plugins.find('webxr')
         const checkoutHandler = webxrPlugin.getHandler('checkout')
         const mesh = searchPlugin.search(this.search)
         
-        await checkoutHandler.invoke(new AddCheckoutCommand(mesh, offset, size, UIOffset, UIRotation))
+        await checkoutHandler.invoke(new AddCheckoutCommand(mesh, offset, size, UIOffset, UIRotation, UIScale))
     }
 }
 

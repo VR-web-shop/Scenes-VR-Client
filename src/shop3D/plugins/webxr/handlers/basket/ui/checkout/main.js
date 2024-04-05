@@ -4,6 +4,7 @@ import { buildCheckoutPage } from "./CheckoutPage.js"
 import { buildContentPage } from "./ContentPage.js"
 import * as THREE from 'three'
 import ContentObject from "./ContentObject.js"
+import SelectableProduct from "../../../select/selectables/SelectableProduct.js";
 
 /**
  * General UI options
@@ -77,9 +78,10 @@ export async function buildBasketUI(guiHandler) {
         content.show()
     })
     content.checkoutButton.addClickListener(() => {
+        const valuta = SelectableProduct.getValuta()
         const contentObjects = content.contentObjects()
         const totalPrice = contentObjects.reduce((acc, obj) => acc + obj.getPrice(), 0)
-        checkout.setTotal(totalPrice)
+        checkout.setTotal(totalPrice, valuta.symbol)
         checkoutDispatcher.dispatchEvent({ type: EVENTS.START_CHECKOUT, contentObjects })
         content.hide()
         checkout.show()

@@ -18,7 +18,7 @@ class LoadMeshCommand extends Command {
      * @param {Object} scale - The scale of the 3D object.
      * @param {String} name - The name of the 3D object (optional).
      */
-    constructor(src, submeshes = [], position = { x: 0, y: 0, z: 0 }, rotation = { x: 0, y: 0, z: 0 }, scale = { x: 1, y: 1, z: 1 }, name= null) {
+    constructor(src, submeshes = [], position = { x: 0, y: 0, z: 0 }, rotation = { x: 0, y: 0, z: 0 }, scale = { x: 1, y: 1, z: 1 }, name = null) {
         super()
         this.src = src
         this.submeshes = submeshes

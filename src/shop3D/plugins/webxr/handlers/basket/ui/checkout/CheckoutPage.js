@@ -71,8 +71,8 @@ export function buildCheckoutPage() {
     totalText.setPosition(totalTextPosition)
     cancelButton.setPosition(cancelButtonPosition)
 
-    function setTotal(total) {
-        totalText.setText(`${totalTextValue} $${total}`)
+    function setTotal(total, symbol = 'DKK') {
+        totalText.setText(`${totalTextValue} ${total} ${symbol}`)
     }
 
     function show() {

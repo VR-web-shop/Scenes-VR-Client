@@ -1,54 +1,53 @@
 <template>
-    <div class="bg-slate-800 rounded-md shadow-md p-3 w-64 overflow-y-auto text-white" style="z-index: 1;">
-        <h1 class="text-md text-center font-bold mb-1">
-            Virtual Reality Webshop
-        </h1>
+    <div>
+        <div class="flex gap-3 absolute top-0 left-0 right-0 overflow-y-auto">
+            <div class="bg-black/60 shadow-md p-3 text-white w-full text-center">
+                <small class="text-orange-500 font-bold text-xs uppercase w-full">
+                    Over {{ noOfProducts }} unique products available!
+                </small>
+            </div>
+        </div>
 
-        <p class="text-gray-300 text-sm mb-3">
-            Welcome to the webshop where all products are displayed in virtual reality.
-        </p>
 
-        <p class="text-gray-300 font-bold text-sm mb-3">
-            How does it work?
-        </p>
+        <div class="flex gap-3 absolute bottom-3 left-0 right-0 overflow-y-auto">
+            <div class="rounded-lg sm:p-6 md:p-12 max-w-3xl mx-auto bg-black/60 shadow-lg overflow-y-auto text-white flex justify-between gap-3">
+                <div>
+                    <h1 class="text-2xl text-left font-bold mb-1 tracking-wider">
+                        CircuitSpectrum VR
+                    </h1>
 
-        <p class="text-gray-300 text-sm mb-3">
-            1. Click on the 'Enter VR'-button below to start the virtual reality experience.
-        </p>
+                    <small class="text-orange-500 font-bold text-xs uppercase mb-1">
+                        Unlock the Gateway to Your Virtual Realm.
+                    </small>
 
-        <p class="text-gray-300 text-sm mb-3">
-            2. Use teleportation to move around the scene.
-        </p>
+                    <p class="text-gray-300 text-sm mb-3">
+                        Dive into a world of immersive experiences with our cutting-edge virtual reality electronics.
+                        <br />Log in to explore, create, and connect in the digital dimension.
+                    </p>
+                </div>
 
-        <p class="text-gray-300 text-sm mb-3">
-            3. Use the pocket near your body to pull out a basket to add products to your cart.
-        </p>
+                <button @click="toggle" class="text-white px-5 py-1 rounded-md"
+                    :class="webXR ? 'bg-red-500' : 'bg-blue-500'">
+                    {{ webXR ? 'Exit VR' : 'Enter VR' }}
+                </button>
 
-        <p class="text-gray-300 text-sm mb-3">
-            4. Teleport to a product, take it with your hand, and put it in the basket.
-        </p>
-
-        <p class="text-gray-300 text-sm mb-3">
-            5. Teleport to the checkout area and place the basket on the designated area.
-        </p>
-
-        <p class="text-gray-300 text-sm mb-3">
-            6. Click on the checkout button to initiate a new checkout.
-        </p>
-
-        <p class="text-gray-300 text-sm mb-3">
-            7. Take of your headset and complete the checkout on the webshop.
-        </p>
-
-        <p class="text-gray-300 text-sm mb-3">
-            8. Enjoy your new products!
-        </p>
-
-        <div id="vr-button" class="relative w-full h-20"></div>
-
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
+import { useShop } from '../composables/useShop.js';
+import { useSceneSDK } from '../composables/useScenesSDK.js';
+import { ref, computed } from 'vue';
 
+const shop = useShop()
+const scene = useSceneSDK()
+const webXR = ref(false)
+const noOfProducts = computed(() => scene.noOfProducts)
+
+const toggle = () => {
+    webXR.value = !webXR.value
+    shop.toggleWebXR()
+}
 </script>

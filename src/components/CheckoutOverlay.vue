@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="flex gap-3 fixed top-3 left-3 bottom-3 overflow-y-auto">
         <div v-if="checkoutCtrl.show.value"
             class="h-full w-full bg-white rounded-md shadow-md p-3 w-64 overflow-y-auto border border-gray-300">
             <h1 class="text-xl font-bold mb-1">
@@ -13,7 +13,13 @@
             <div v-if="step === STEPS.overview">
                 <CheckoutProducts />
 
-                <button @click="setStep(STEPS.person)" class="bg-blue-500 text-white px-3 py-1 rounded-md mt-3 w-full">
+                <div v-if="checkoutCtrl.products.value.length === 0" class="bg-red-500 text-white px-3 py-1 rounded-md mt-3 w-full">
+                    <p class="font-bold">
+                        Add products to your cart to continue.
+                    </p>
+                </div>
+
+                <button v-else @click="setStep(STEPS.person)" class="bg-blue-500 text-white px-3 py-1 rounded-md mt-3 w-full">
                     Personal Information
                 </button>
             </div>

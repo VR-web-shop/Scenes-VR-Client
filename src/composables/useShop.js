@@ -1,9 +1,11 @@
 import { ref, computed } from 'vue';
 import { useSceneSDK } from './useScenesSDK.js';
 import { useShoppingCartSDK } from './useShoppingCartSDK.js';
+import { useProductsSDK } from '../composables/useProductsSDK.js';
 
 import AddOnStateChangeListener from '../shop3D/commands/events/AddOnStateChangeListener.js';
 import RemoveOnStateChangeListener from '../shop3D/commands/events/RemoveOnStateChangeListener.js';
+import ToggleWebXRCommand from '../shop3D/commands/webxr/ToggleWebXRCommand.js';
 
 import Shop from '../shop3D/Shop.js'
 
@@ -15,6 +17,7 @@ const isStopped = computed(() => state.value === 'ExitState')
 
 const scenesCtrl = useSceneSDK()
 const shoppingCartCtrl = useShoppingCartSDK()
+const productsCtrl = useProductsSDK()
 
 export function useShop() {
 
@@ -30,12 +33,18 @@ export function useShop() {
         shop.start(canvas)
         await scenesCtrl.start(shop);
         await shoppingCartCtrl.start(shop);
+        await productsCtrl.start(shop)
     }
 
     async function stop() {
         await shop.invoke(new RemoveOnStateChangeListener(onStateChanged))
         await shoppingCartCtrl.exit(shop);
+        await scenesCtrl.exit(shop);
         shop.stop()
+    }
+
+    function toggleWebXR() {
+        shop.invoke(new ToggleWebXRCommand())
     }
 
     return {
@@ -44,6 +53,7 @@ export function useShop() {
         isRunning,
         isStopped,
         start,
-        stop
+        stop,
+        toggleWebXR
     }
 }

@@ -5,8 +5,8 @@ function Checkout(
     surfaceOffset = new THREE.Vector3(0, 0, 0), 
     surfaceSize = new THREE.Vector3(1, 1, 1),
     UIOffset = new THREE.Vector3(0, 3, 0),
-    UIRotation = new THREE.Euler(0, 0, 0)) {
-    
+    UIRotation = new THREE.Euler(0, 0, 0),
+    UIScale = new THREE.Vector3(1, 1, 1)) {
 
     this.intersectsBox = function (box) {
         const point = new THREE.Vector3()
@@ -22,11 +22,19 @@ function Checkout(
     }
 
     this.getUIPosition = function () {
-        return mesh.position.clone().add(UIOffset)
+        return UIOffset.clone().add(mesh.position)
     }
 
     this.getUIEulerRotation = function () {
-        return UIRotation
+        const rotation = new THREE.Euler().setFromQuaternion(mesh.quaternion)
+        rotation.x += UIRotation.x
+        rotation.y += UIRotation.y
+        rotation.z += UIRotation.z
+        return rotation
+    }
+
+    this.getUIScale = function () {
+        return UIScale
     }
 
     this.showHelper = function () {
