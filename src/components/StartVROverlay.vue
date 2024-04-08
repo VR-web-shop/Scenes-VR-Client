@@ -13,7 +13,7 @@
             <div class="rounded-lg sm:p-6 md:p-12 max-w-3xl mx-auto bg-black/60 shadow-lg overflow-y-auto text-white flex justify-between gap-3">
                 <div>
                     <h1 class="text-2xl text-left font-bold mb-1 tracking-wider">
-                        CircuitSpectrum VR
+                        Electronics Hub VR
                     </h1>
 
                     <small class="text-orange-500 font-bold text-xs uppercase mb-1">

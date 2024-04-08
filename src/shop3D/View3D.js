@@ -63,7 +63,8 @@ class View3D extends View {
      */
     render() {
         this.eventDispatcher.dispatchEvent({ type: 'beforerender' })
-        if (!this.renderer.xr !== true) View3D.resizeRendererToDisplaySize(this)
+        if (!this.renderer.xr.isPresenting)
+            View3D.resizeRendererToDisplaySize(this)
         this.renderer.render(this.scene, this.camera)
     }
 
