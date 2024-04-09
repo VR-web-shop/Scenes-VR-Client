@@ -1,7 +1,7 @@
 <template>
-    <div class="flex gap-3 fixed top-3 left-3 bottom-3 overflow-y-auto">
-        <div v-if="checkoutCtrl.show.value"
-            class="h-full w-full bg-white rounded-md shadow-md p-3 w-64 overflow-y-auto border border-gray-300">
+    <div class="flex gap-3 fixed top-0 right-0 bottom-0 overflow-y-auto" style="z-index: 2;">
+        <div v-if="show"
+            class="h-full w-full bg-white shadow-md p-3 w-64 overflow-y-auto border border-gray-300">
             <h1 class="text-xl font-bold mb-1">
                 Checkout
             </h1>
@@ -114,6 +114,7 @@ const checkoutCtrl = useCheckout()
 const shoppingCartCtrl = useShoppingCartSDK()
 const toastCtrl = useToast()
 const productOrder = computed(() => checkoutCtrl.productOrder.value)
+const show = computed(() => checkoutCtrl.show.value)
 
 const params = ref({})
 
@@ -162,6 +163,7 @@ const submitPaymentMethod = async (paymentOptionsParams) => {
 
 const cancelPurchase = async () => {
     await shoppingCartCtrl.cancelCheckout()
+    await checkoutCtrl.reloadCheckout()
     toastCtrl.add('Purchase cancelled', 5000, 'success')
 }
 

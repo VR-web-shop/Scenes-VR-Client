@@ -2,6 +2,7 @@ import { ref, computed } from 'vue';
 import { useSceneSDK } from './useScenesSDK.js';
 import { useShoppingCartSDK } from './useShoppingCartSDK.js';
 import { useProductsSDK } from '../composables/useProductsSDK.js';
+import { useCheckout } from './useCheckout.js';
 
 import AddOnStateChangeListener from '../shop3D/commands/events/AddOnStateChangeListener.js';
 import RemoveOnStateChangeListener from '../shop3D/commands/events/RemoveOnStateChangeListener.js';
@@ -18,6 +19,7 @@ const isStopped = computed(() => state.value === 'ExitState')
 const scenesCtrl = useSceneSDK()
 const shoppingCartCtrl = useShoppingCartSDK()
 const productsCtrl = useProductsSDK()
+const checkoutCtrl = useCheckout()
 
 export function useShop() {
 
@@ -34,12 +36,14 @@ export function useShop() {
         await scenesCtrl.start(shop);
         await shoppingCartCtrl.start(shop);
         await productsCtrl.start(shop)
+        await checkoutCtrl.start(shop)
     }
 
     async function stop() {
         await shop.invoke(new RemoveOnStateChangeListener(onStateChanged))
         await shoppingCartCtrl.exit(shop);
         await scenesCtrl.exit(shop);
+        await checkoutCtrl.exit(shop)
         shop.stop()
     }
 

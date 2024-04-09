@@ -29,12 +29,19 @@ function select(event) {
     const socket = controllerSockets.find(socket => socket.mesh.uuid === controller.uuid)
     const selectable = socket.intersect(selectables)
     if (selectable) socket.setSelected(selectable)
+    else socket.removeSelected()
 }
 
 function deselect(event) {
     const controller = event.target
     const socket = controllerSockets.find(socket => socket.mesh.uuid === controller.uuid)
     socket.removeSelected()
+}
+
+function deselectAll() {
+    for (let i = 0; i < controllerSockets.length; i++) {
+        controllerSockets[i].removeSelected()
+    }
 }
 
 /**
@@ -72,7 +79,7 @@ class SelectHandler extends WebXRHandler {
         }
 
         // Note: If the xr session is ended, clear the selected.
-        this.view.renderer.xr.addEventListener('sessionend', deselect)
+        this.view.renderer.xr.addEventListener('sessionend', deselectAll)
         this.view.addBeforeRenderListener(updateLoop)
         this.initInvoker({ selectables, controllerSockets })
     }
@@ -93,7 +100,7 @@ class SelectHandler extends WebXRHandler {
 
         selectables.length = 0
         controllerSockets.length = 0
-        this.view.renderer.xr.removeEventListener('sessionend', deselect)
+        this.view.renderer.xr.removeEventListener('sessionend', deselectAll)
         this.view.removeBeforeRenderListener(updateLoop)
     }
 }

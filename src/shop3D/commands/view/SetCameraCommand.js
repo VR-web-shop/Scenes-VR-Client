@@ -39,6 +39,8 @@ class SetCameraCommand extends Command {
         if (this.target) {
             camera.lookAt(this.target.x, this.target.y, this.target.z)
         }
+
+        options.view.cameraYRotation = camera.rotation.y
     }
 }
 

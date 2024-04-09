@@ -72,6 +72,8 @@ export function useSceneSDK() {
     }
 
     async function exit(shop) {
+        if (eventHandler === null) return;
+        
         ws.removeEventListener(ws.EVENTS.SCENES_UPDATE_SCENE_PRODUCT, eventHandler.onUpdateSceneProduct.bind(eventHandler));
         ws.removeEventListener(ws.EVENTS.SCENES_DELETE_SCENE_PRODUCT, eventHandler.onDeleteSceneProduct.bind(eventHandler));
         ws.removeEventListener(ws.EVENTS.SCENES_NEW_PRODUCT_ENTITY, eventHandler.onNewSceneProductEntity.bind(eventHandler));

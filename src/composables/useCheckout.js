@@ -1,8 +1,8 @@
 import { ref } from 'vue'
 import { computed } from 'vue'
 import { useShoppingCartSDK } from './useShoppingCartSDK.js'
-
-const shoppingCartCtrl = useShoppingCartSDK()
+import AddWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/checkout/AddWebXRCheckoutListenerCommand.js'
+import RemoveWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/checkout/RemoveWebXRCheckoutListenerCommand.js'
 
 const cart = ref(null)
 const products = ref([])
@@ -13,6 +13,13 @@ const paymentOptions = ref([])
 const show = computed(()=>cart.value && cart.value.cart_state_name === 'WAITING_FOR_CHECKOUT')
 
 export const useCheckout = () => {
+    const shoppingCartCtrl = useShoppingCartSDK()
+
+    async function start(shop) {
+    }
+
+    async function exit(shop) {
+    }
 
     async function loadCart() {
         cart.value = await shoppingCartCtrl.createOrFindCart()
@@ -93,6 +100,8 @@ export const useCheckout = () => {
     }
 
     return {
+        start,
+        exit,
         cart,
         products,
         productOrder,

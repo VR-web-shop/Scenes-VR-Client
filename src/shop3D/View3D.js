@@ -2,6 +2,14 @@ import View from "./abstractions/View.js";
 import * as THREE from 'three';
 
 /**
+ * Parameters for a camera
+ * rotation effect.
+ */
+let rotateSwitch = false
+const rotateSpeed = 0.0001
+const rotateThreshold = 0.05
+
+/**
  * @class View3D
  * @classdesc A 3D view based on Three.js
  * @extends View
@@ -36,7 +44,8 @@ class View3D extends View {
         this.scene = new THREE.Scene()
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
         this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true })
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+        this.renderer.shadowMap.enabled = true
+        this.cameraYRotation = this.camera.rotation.y
         View3D.resizeRendererToDisplaySize(this)
     }
 
@@ -63,8 +72,10 @@ class View3D extends View {
      */
     render() {
         this.eventDispatcher.dispatchEvent({ type: 'beforerender' })
-        if (!this.renderer.xr.isPresenting)
+        if (!this.renderer.xr.isPresenting) {
             View3D.resizeRendererToDisplaySize(this)
+            View3D.rotateCamera(this)
+        }
         this.renderer.render(this.scene, this.camera)
     }
 
@@ -106,6 +117,20 @@ class View3D extends View {
             renderer.setSize(width, height, false);
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
+        }
+    }
+
+    static rotateCamera(view) {
+        if (rotateSwitch) {
+            view.camera.rotation.y += rotateSpeed
+        } else {
+            view.camera.rotation.y -= rotateSpeed
+        }
+    
+        if (view.camera.rotation.y > view.cameraYRotation+rotateThreshold) {
+            rotateSwitch = false
+        } else if (view.camera.rotation.y < view.cameraYRotation-rotateThreshold) {
+            rotateSwitch = true
         }
     }
 }

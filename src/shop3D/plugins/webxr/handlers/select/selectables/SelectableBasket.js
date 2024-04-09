@@ -20,7 +20,7 @@ class SelectableBasket extends Selectable {
         this.mesh.visible = false
         this.placeholderMesh.visible = false
         this.mesh.add(placeholderMesh)
-
+        
         this.setPlaceholderOffset(placeholderOffset)
         this.setSelectOffset(selectOffset)
 
@@ -56,6 +56,7 @@ class SelectableBasket extends Selectable {
 
         this.mesh.visible = false
         this.placeholderMesh.visible = false
+        this.mesh.position.copy(new THREE.Vector3(-1000, -1000, -1000))
     }
 
     static getSelectableBasket() {

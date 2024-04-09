@@ -1,5 +1,6 @@
 import ShoppingCartSDK from '@vr-web-shop/shopping-cart'
 import { useCheckout } from './useCheckout.js'
+import { useShoppingCart } from './useShoppingCart.js'
 import { ref, toRaw } from 'vue'
 
 import AddWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/checkout/AddWebXRCheckoutListenerCommand'
@@ -61,8 +62,8 @@ export function useShoppingCartSDK() {
     async function start(shop) {
         await shop.invoke(new AddWebXRCheckoutListenerCommand('startCheckout', startCheckout.bind(this)))
         await shop.invoke(new AddWebXRCheckoutListenerCommand('cancelCheckout', cancelCheckout.bind(this)))
-        await shop.invoke(new AddWebXRAddProductListenerCommand('addProduct', addProductToCart.bind(this)))
-        await shop.invoke(new AddWebXRAddProductListenerCommand('removeProduct', removeProductFromCart.bind(this)))
+        await shop.invoke(new AddWebXRAddProductListenerCommand('addProduct', addProductToCartEvent.bind(this)))
+        await shop.invoke(new AddWebXRAddProductListenerCommand('removeProduct', removeFromCartEvent.bind(this)))
         await loadCart(shop)
     }
 
@@ -73,8 +74,8 @@ export function useShoppingCartSDK() {
     async function exit(shop) {
         await shop.invoke(new RemoveWebXRCheckoutListenerCommand('startCheckout', startCheckout.bind(this)))
         await shop.invoke(new RemoveWebXRCheckoutListenerCommand('cancelCheckout', cancelCheckout.bind(this)))
-        await shop.invoke(new RemoveWebXRAddProductListenerCommand('addProduct', addProductToCart.bind(this)))
-        await shop.invoke(new RemoveWebXRAddProductListenerCommand('removeProduct', removeProductFromCart.bind(this)))
+        await shop.invoke(new RemoveWebXRAddProductListenerCommand('addProduct', addProductToCartEvent.bind(this)))
+        await shop.invoke(new RemoveWebXRAddProductListenerCommand('removeProduct', removeFromCartEvent.bind(this)))
     }
 
     async function loadCart(shop) {
@@ -82,12 +83,12 @@ export function useShoppingCartSDK() {
         
         if (cart.ProductEntity) {
             for (const productEntity of cart.ProductEntity) {
-                const {rows} = await sdk.api.ProductEntityController.findAll({
+                const { rows } = await sdk.api.ProductEntityController.findAll({
                     limit: 1,
                     where: {uuid: productEntity.uuid},
                     include: [{model: 'Product'}]
                 })
-                console.log('rows', rows)
+
                 await shop.invoke(new AddWebXRReservedProductEntitiesCommand(rows[0].Product.uuid, [toRaw(productEntity)]))
             }
         }
@@ -120,12 +121,30 @@ export function useShoppingCartSDK() {
         return _cart.value
     }
 
-    async function addProductToCart(event) {
+    async function getCartToken() {
+        return CartToken.get()
+    }
+
+    async function addProductToCartEvent(event) {
+        const product = event.data.selectableProduct
+        const productEntitiesInUse = product.productEntitiesInUse
+        
+        await addProductToCart(productEntitiesInUse)
+        useShoppingCart().reloadCart()
+    }
+
+    async function removeFromCartEvent(event) {
+        const productEntitiesInUse = event.data.productEntitiesInUse
+        console.log(productEntitiesInUse)
+        await removeProductFromCart(productEntitiesInUse)
+        useShoppingCart().reloadCart()
+    }
+
+    async function addProductToCart(productEntities) {
         const cart = await createOrFindCart()
         const access_token = CartToken.get()
-        const product = event.data.selectableProduct
        
-        for (const productEntity of product.productEntitiesInUse) {
+        for (const productEntity of productEntities) {
             await sdk.api.CartProductEntityController.create({
                 cart_uuid: cart.uuid, 
                 product_entity_uuid: productEntity.uuid,
@@ -134,13 +153,9 @@ export function useShoppingCartSDK() {
         }
     }
 
-    async function removeProductFromCart(event) {
+    async function removeProductFromCart(productEntitiesInUse) {
         const cart = await createOrFindCart()
         const access_token = CartToken.get()
-        
-        const product = event.data.checkoutProduct.selectableProduct
-        const productEntitiesInUse = event.data.productEntitiesInUse
-
         const refreshedCart = await sdk.api.CartController.find({ uuid: cart.uuid }, {
             customParams: {access_token: CartToken.get()},
             include: 'product_entities'
@@ -178,9 +193,8 @@ export function useShoppingCartSDK() {
             access_token: CartToken.get(),
             cart_state_name: CART_STATES.WAITING_FOR_CHECKOUT
         })
-        
-        const checkoutCtrl = useCheckout()
-        await checkoutCtrl.reloadCheckout()
+
+        useCheckout().reloadCheckout()
     }
 
     async function cancelCheckout() {
@@ -192,8 +206,7 @@ export function useShoppingCartSDK() {
             cart_state_name: CART_STATES.OPEN_FOR_PRODUCT_ENTITIES
         })
 
-        const checkoutCtrl = useCheckout()
-        await checkoutCtrl.reloadCheckout()
+        useCheckout().reloadCheckout()
     }
     
     return {
@@ -202,6 +215,10 @@ export function useShoppingCartSDK() {
         exit,
         CartToken,
         createOrFindCart,
+        startCheckout,
         cancelCheckout,
+        getCartToken,
+        addProductToCart,
+        removeProductFromCart,
     }
 }

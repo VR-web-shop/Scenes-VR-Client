@@ -7,6 +7,7 @@ import SpatialUIText from '../../gui/spatialui/elements/SpatialUIText.js'
 import * as THREE from 'three'
 
 let valuta = { name: 'Euro', short: 'EUR', symbol: '€', active: false }
+let font = null
 
 class SelectableProduct extends Selectable {
     constructor(mesh, id, product, productEntities, checkoutHandler) {
@@ -298,7 +299,7 @@ class SelectableProduct extends Selectable {
     }
 
     static async buildUI(selectableProduct, uiPosition, uiRotation, uiScale) {
-        const font = await SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
+        if (!font) font = await SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
         const textOptions = { font, size: 0.05, height: 0.01 }
         const nameText = new SpatialUIText("{name}", textOptions, 0x000000)
         const priceText = new SpatialUIText("{price}", textOptions, 0x000000)

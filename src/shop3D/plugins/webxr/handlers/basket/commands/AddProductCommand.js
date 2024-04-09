@@ -41,7 +41,6 @@ class AddProductCommand extends WebXRHandlerCommand {
         
         const checkoutProduct = new CheckoutProduct(this.selectableProduct)
         options.checkoutProducts.push(checkoutProduct)
-        console.log('checkoutProduct:', this.castEvent)
         if (this.castEvent) options.dispatchEvent('addProduct', checkoutProduct)
     }
 }

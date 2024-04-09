@@ -1,6 +1,8 @@
 import SpatialUIElement from "../SpatialUIElement.js";
 import * as THREE from 'three';
 
+const noImg = '/images/no_img.png';
+
 /**
  * @class SpatialUIImage
  * @classdesc A flat image.
@@ -21,7 +23,18 @@ class SpatialUIImage extends SpatialUIElement {
     }
 
     static async loadTexture(textureUrl) {
+        if (typeof textureUrl !== 'string') {
+            throw new Error('textureUrl is not a string')
+        }
+
         const loader = new THREE.TextureLoader();
+        const image = await fetch(textureUrl);
+        if (!image.ok) {
+            console.log('Image not found at URL, loading placeholder image');
+            return await loader.loadAsync(noImg);
+        }
+
+        
         return await loader.loadAsync(textureUrl);
     }
 }
