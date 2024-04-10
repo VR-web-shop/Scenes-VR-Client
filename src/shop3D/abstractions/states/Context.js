@@ -17,9 +17,9 @@ const Context = function(initialState, options = {}) {
     throw new Error('Invalid state')
   }
 
-  this.state = initialState
-  this.options = {...options}
-  this.eventDispatcher = new THREE.EventDispatcher()
+  this.state = null;
+  this.options = { ...options };
+  this.eventDispatcher = new THREE.EventDispatcher();
 
   /**
    * @function setState
@@ -31,6 +31,10 @@ const Context = function(initialState, options = {}) {
     if (!(state instanceof State)) {
         throw new Error('Invalid state')
     }
+
+	if (this.state && this.state === state) {
+		return;
+	}
 
     if (this.state && this.state !== state) {
         this.state.exit()
@@ -49,6 +53,11 @@ const Context = function(initialState, options = {}) {
         this.state.enter(this.setState.bind(this))
     }
   }
+
+  /*
+   * Set the initial state
+   */
+   this.setState(initialState)
   
   /**
    * @function getState

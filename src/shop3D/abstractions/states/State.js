@@ -20,9 +20,10 @@ class State {
      * @param {Object} options - The options to be set.
      */
     setOptions(options) {
+		if (!options) throw new Error('options cannot be null')
+
         this.options = options
     }
-
     /**
      * @function enter
      * @description Executed when the context changes to this state.
@@ -30,7 +31,8 @@ class State {
      * @abstract
      * @returns {void}
      */
-    enter(setState) { }
+    enter(setState) {
+	}
 
     /**
      * @function exit

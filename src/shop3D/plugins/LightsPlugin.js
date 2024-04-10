@@ -5,6 +5,7 @@ import * as THREE from 'three';
  * @class lights plugin
  * @classdesc The plugin for the lights.
  * @extends Plugin
+ * @property {string} name - The name of the plugin.
  * @property {Object} view - The view of the shop.
  * @property {Array} lights - The list of lights.
  */
@@ -14,7 +15,7 @@ class LightsPlugin extends Plugin {
      * @constructor
      */
     constructor() {
-        super()
+        super('lights')
     }
 
     /**

@@ -81,7 +81,7 @@ class WebXRPlugin extends Plugin {
      * @constructor
      */
     constructor() {
-        super()
+        super('webxr')
     }
 
     /**

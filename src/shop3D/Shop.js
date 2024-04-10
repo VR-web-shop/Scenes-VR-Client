@@ -1,17 +1,16 @@
 import Manager from "./abstractions/Manager.js";
-import View3D from "./View3D.js";
 
 import PrimitivesPlugin from "./plugins/PrimitivesPlugin.js";
 import CachesPlugin from "./plugins/CachesPlugin.js";
 import LightsPlugin from "./plugins/LightsPlugin.js";
-
 import SearchPlugin from "./plugins/SearchPlugin.js";
-
 import WebXRPlugin from "./plugins/webxr/WebXRPlugin.js";
 
 import InitializeState from "./states/InitializeState.js";
 import ExecuteState from "./states/ExecuteState.js";
 import ExitState from "./states/ExitState.js";
+
+import View3D from "./View3D.js";
 
 /**
  * @class Shop
@@ -24,12 +23,11 @@ const Shop = function() {
     const view = new View3D()
     const manager = new Manager(view)
 
-    manager.addPlugin('primitives', new PrimitivesPlugin())
-    manager.addPlugin('search', new SearchPlugin())
-    manager.addPlugin('caches', new CachesPlugin())
-    manager.addPlugin('lights', new LightsPlugin())
-
-    manager.addPlugin('webxr', new WebXRPlugin())
+    manager.addPlugin(new PrimitivesPlugin())
+    manager.addPlugin(new LightsPlugin())
+    manager.addPlugin(new SearchPlugin())
+    manager.addPlugin(new CachesPlugin())
+    manager.addPlugin(new WebXRPlugin())
 
     /**
      * @function isStopped
