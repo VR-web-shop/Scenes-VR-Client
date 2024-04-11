@@ -2,6 +2,20 @@ import View from "./abstractions/View.js";
 import * as THREE from 'three';
 
 /**
+ * @function _createDefaultScene
+ * @description create a Three.js scene
+ * @param {object} rendererOptions - the renderers options
+ * returns {object}
+ */
+function _createDefaultScene(rendererOptions) {
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    const renderer = new THREE.WebGLRenderer(rendererOptions)
+	renderer.toneMapping = THREE.ACESFilmicToneMapping
+	return { scene, camera, renderer }
+}
+
+/**
  * @class View3D
  * @classdesc A 3D view based on Three.js
  * @extends View
@@ -16,9 +30,10 @@ class View3D extends View {
     /**
      * @constructor
      */
-    constructor() {
+    constructor(createDefaultScene=_createDefaultScene) {
         super()
         this.eventDispatcher = new THREE.EventDispatcher()
+		this.createDefaultScene = createDefaultScene
     }
 
     /**
@@ -31,12 +46,17 @@ class View3D extends View {
         if (this.initialized)
             return;
 
+		const rendererOptions = { antialias: true }
+		if (canvas) rendererOptions.canvas = canvas
+
         this.initialized = true
-        this.canvas = canvas
-        this.scene = new THREE.Scene()
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true })
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+		
+		const data = this.createDefaultScene(canvas)
+		this.scene = data.scene;
+		this.camera = data.camera;
+		this.renderer = data.renderer;
+		this.canvas = data.renderer.domElement;
+
         View3D.resizeRendererToDisplaySize(this)
     }
 

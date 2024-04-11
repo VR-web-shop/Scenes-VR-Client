@@ -19,8 +19,10 @@ import View3D from "./View3D.js";
  * @property stop - The function to stop the shop.
  * @property invoke - The function to execute a command.
  */
-const Shop = function() {
-    const view = new View3D()
+const Shop = function(view = new View3D()) {
+	if (!(view instanceof View3D)) {
+		throw new Error('view must be an instance of View3D')
+	}
     const manager = new Manager(view)
 
     manager.addPlugin(new PrimitivesPlugin())
@@ -52,15 +54,11 @@ const Shop = function() {
     /**
      * @function start
      * @description Start the shop.
-     * @param {HTMLCanvasElement} canvas - The canvas to render the shop.
+     * @param {HTMLCanvasElement} canvas - The canvas to render the shop. (optional)
      * @returns {void}
      * @public
      */
-    this.start = function(canvas) {
-        if (!(canvas instanceof HTMLCanvasElement)) {
-            throw new Error('Invalid canvas')
-        }
-
+    this.start = function(canvas=null) {
         if (isRunning()) {
             throw new Error('The shop is already running')
         }
@@ -98,6 +96,9 @@ const Shop = function() {
     this.invoke = async (command) => {
         await manager.invoke(command)
     }
+
+	this._manager = manager;
+	this._view = view
 }
 
 export default Shop

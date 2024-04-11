@@ -5,11 +5,15 @@ test('Plugin must be defined', () => {
 	expect(Plugin).toBeDefined()
 })
 
+test('Plugin must throw an error if the name is not a string', () => {
+	expect(() => new Plugin()).toThrowError()
+})
+
 test('Plugin must define an init method', () => {
-	expect((new Plugin()).init).toBeDefined()
+	expect((new Plugin('p')).init).toBeDefined()
 })
 
 test('Plugin must define an exit method', () => {
-	expect((new Plugin()).exit).toBeDefined()	
+	expect((new Plugin('p')).exit).toBeDefined()	
 })
 
