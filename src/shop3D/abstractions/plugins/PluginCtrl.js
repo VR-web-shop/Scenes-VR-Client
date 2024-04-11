@@ -10,34 +10,30 @@ const PluginCtrl = function () {
     /**
      * @function add
      * @description Add a plugin to the controller.
-     * @param {string} name - The name of the plugin.
      * @param {Plugin} plugin - The plugin to be added.
-     * @returns {void}
-     * @throws {Error} - If the name is not a string.
+     * @returns {PluginCtrl} pluginCtrl - The plugin controller
      * @throws {Error} - If the plugin already exists.
      * @throws {Error} - If the plugin is not an instance of Plugin.
      */
-    this.add = function (name, plugin) {
-        if (typeof name !== 'string') {
-            throw new Error('Invalid name')
-        }
-
-        if (plugins[name.toLowerCase()]) {
-            throw new Error('Plugin already exists')
-        }
-        
+    this.add = function (plugin) {	
         if (!(plugin instanceof Plugin)) {
             throw new Error('Invalid plugin')
         }
+
+        if (plugins[plugin.name.toLowerCase()]) {
+            throw new Error('Plugin already exists')
+        }
         
-        plugins[name.toLowerCase()] = plugin
+        plugins[plugin.name.toLowerCase()] = plugin
+
+		return this;
     }
 
     /**
      * @function remove
      * @description Remove a plugin from the controller.
      * @param {string} name - The name of the plugin.
-     * @returns {void}
+     * @returns {PluginCtrl} pluginCtrl - the plugin controller
      * @throws {Error} - If the name is not a string.
      * @throws {Error} - If the plugin does not exist.
      */
@@ -51,6 +47,8 @@ const PluginCtrl = function () {
         }
 
         delete plugins[name.toLowerCase()]
+
+		return this;
     }
 
     /**
@@ -64,7 +62,7 @@ const PluginCtrl = function () {
         if (typeof name !== 'string') {
             throw new Error('Invalid name')
         }
-
+		
         return plugins[name.toLowerCase()]
     }
 

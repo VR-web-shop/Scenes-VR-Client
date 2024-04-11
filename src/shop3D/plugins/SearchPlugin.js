@@ -4,6 +4,7 @@ import Plugin from "../abstractions/plugins/Plugin.js";
  * @class search plugin
  * @classdesc The plugin for searching.
  * @extends Plugin
+ * @property {string} name - The name of the plugin.
  * @property {Object} view - The view of the shop.
  */
 class SearchPlugin extends Plugin {
@@ -12,7 +13,7 @@ class SearchPlugin extends Plugin {
      * @constructor
      */
     constructor() {
-        super()
+        super('search')
     }
 
     /**
@@ -22,7 +23,7 @@ class SearchPlugin extends Plugin {
      * @returns {void}
      */
     init(view) {
-        this.view = view
+		super.init(view)
     }
 
     /**

@@ -33,6 +33,7 @@ function calculateCASKey(str, arr = []) {
  * @class caches plugin
  * @classdesc The plugin for the caches.
  * @extends Plugin
+ * @property {string} name - The name of the plugin.
  * @property {Object} view - The view of the shop.
  */
 class CachesPlugin extends Plugin {
@@ -41,7 +42,7 @@ class CachesPlugin extends Plugin {
      * @constructor
      */
     constructor() {
-        super()
+        super('caches')
     }
 
     /**

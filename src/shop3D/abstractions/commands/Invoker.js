@@ -8,7 +8,7 @@ import Command from './Command.js'
  * @param {Object} options - The options for the invoker.
  */
 const Invoker = function(options = {}) {
-  this.options = options
+  this.options = options || {}
 
   /**
    * @function invoke
