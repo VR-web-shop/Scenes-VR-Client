@@ -37,8 +37,12 @@ const shoppingCart = useShoppingCart();
 const toast = useToast();
 
 const removeProduct = async () => {
-    let productEntities = props.product.cartProductEntities.map(p => p.ProductEntity)
+    console.log(props.product)
+    let productEntities = props.product.cartProductEntities.map(p => p)
     productEntities = productEntities.slice(0, quantity.value);
+    productEntities = productEntities.map(p => {
+        return { uuid: p.product_entity_client_side_uuid }
+    })
     await shoppingCartSDK.removeProductFromCart(productEntities)
     await shoppingCart.reloadCart()
     toast.add('Product removed from cart', 5000, 'success');

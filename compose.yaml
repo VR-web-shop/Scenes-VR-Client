@@ -1,0 +1,7 @@
+services:
+  scenesvrclient:
+    image: scenesvrclient:v1.0
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "5174:5174"

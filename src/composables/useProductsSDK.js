@@ -9,7 +9,7 @@ const valuta = ref(null)
 export function useProductsSDK() {
 
     async function start(shop) {
-        const { rows } = await sdk.api.ValutaSettingController.findAll({
+        /*const { rows } = await sdk.api.ValutaSettingController.findAll({
             limit: 1,
             where: {
                 active: 1
@@ -17,7 +17,12 @@ export function useProductsSDK() {
         })
 
         valuta.value = rows[0]
-        
+        */
+        valuta.value = {
+            name: 'Euro',
+            short: 'EUR',
+            symbol: '€'
+        }
         await shop.invoke(new SetWebXRValutaSettingCommand(
             valuta.value.name,
             valuta.value.short,

@@ -13,10 +13,11 @@
     "@vr-web-shop/auth": "1.0.38",
     "@vr-web-shop/products": "1.0.13",
     "@vr-web-shop/scenes": "1.0.40",
-    "@vr-web-shop/shopping-cart": "1.0.12",
+    "@vr-web-shop/shopping-cart": "1.0.13",
     "canvas": "^2.11.2",
     "jsdom": "^24.0.0",
     "three": "^0.162.0",
+    "uuid": "^9.0.1",
     "vue": "^3.4.19",
     "vue-router": "^4.3.0",
     "websocket": "^1.0.34"

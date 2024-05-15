@@ -117,6 +117,7 @@ class AddWebXRBasketCommand extends Command {
          * Create checkout UI.
          */
         const basketUIContainer = await guiHandler.invoke(new FindUIObjectByName('basket'))
+        
         if (!basketUIContainer) {
             const ui = await buildBasketUI(guiHandler)
             await guiHandler.invoke(new AddUIObjectCommand(ui.parent.container))

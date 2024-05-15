@@ -25,6 +25,19 @@ class InitializeState extends State {
     enter(setState) {
         this.options.plugins.init(this.options.view)
         setState(new ExecuteState())
+
+        const view = this.options.view;
+
+        /**
+         * https://threejs.org/manual/#en/webxr-basics
+         * > We need to let three.js run our render loop. 
+         * > Until now we have used a requestAnimationFrame 
+         * > loop but to support VR we need to let three.js 
+         * > handle our render loop for us. We can do that by 
+         * > calling WebGLRenderer.setAnimationLoop and passing a 
+         * > function to call for the loop.
+         */
+        view.renderer.setAnimationLoop(view.render.bind(view));
     }
 
     /**

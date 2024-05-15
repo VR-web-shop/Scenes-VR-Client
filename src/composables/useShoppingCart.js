@@ -1,7 +1,7 @@
 import { useShoppingCartSDK } from './useShoppingCartSDK.js';
 import { useSceneSDK } from './useScenesSDK.js';
 import { useCheckout } from './useCheckout.js';
-import { ref } from 'vue';
+import { ref, toRaw } from 'vue';
 
 const products = ref([])
 const count = ref(0)
@@ -19,36 +19,42 @@ export function useShoppingCart() {
 
     const reloadCart = async () => {
         const shoppingCart = useShoppingCartSDK()
-        const cart = await shoppingCart.createOrFindCart()
-        const token = await shoppingCart.getCartToken()
-    
-        const { rows } = await shoppingCart.sdk.api.CartProductEntityController.findAll({
-            limit: 100,
-            where: { cart_uuid: cart.uuid },
-            customParams: {
-                access_token: token,
-                cart_uuid: cart.uuid,
-            },
-            include: [
-                { model: 'ProductEntity' }
-            ]
-        })
-    
+        await shoppingCart.createOrFindCart()
+        const cartProductEntities = shoppingCart._cartProductEntities.value 
+        
+        /**
+         * Setup cart products
+         */
+        
         const productsArr = []
         const { sdk: scenesSDK } = useSceneSDK()
-        for (const row of rows) {
-            const exist = productsArr.find(p => p.uuid === row.ProductEntity.product_uuid)
+        for (const cartProductEntity of cartProductEntities) {
+
+            const productEntity = await scenesSDK.api.ProductEntityController.find({ 
+                uuid: cartProductEntity.product_entity_client_side_uuid,
+            })
+            
+            const exist = productsArr.find(p => {
+                return p.uuid === productEntity.product_uuid
+            })
     
             if (exist) {
                 exist.quantity++
-                exist.cartProductEntities.push(row)
+                exist.cartProductEntities.push(toRaw(cartProductEntity))
                 continue
             }
-    
-            const product = await scenesSDK.api.ProductController.find({ uuid: row.ProductEntity.product_uuid })
-            productsArr.push({ ...product, quantity: 1, cartProductEntities: [row] })
+            
+            const product = await scenesSDK.api.ProductController.find({ 
+                uuid: productEntity.product_uuid,
+            })
+
+            productsArr.push({ 
+                ...product, 
+                quantity: 1, 
+                cartProductEntities: [toRaw(cartProductEntity)] 
+            })
         }
-    
+        
         count.value = productsArr.length
         products.value = productsArr
     }

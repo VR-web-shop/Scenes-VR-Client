@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="productOrder">
         <div class="border border-gray-300 p-3 rounded-md shadow-md mt-3">
             <p class="font-bold uppercase text-xs mb-3">Personal Information</p>
 
@@ -40,8 +40,8 @@
             <div class="flex justify-between">
                 <p class="font-bold">Delivery Option:</p>
                 <div class="text-right">
-                    <p>{{ productOrder.DeliverOption.name }}</p>
-                    <p>{{ productOrder.DeliverOption.price }}{{ valuta }}</p>
+                    <p>{{ deliveryOption.name }}</p>
+                    <p>{{ deliveryOption.price }}{{ valuta }}</p>
                 </div>
             </div>
         </div>
@@ -52,8 +52,8 @@
             <div class="flex items-center justify-between">
                 <p class="font-bold">Payment Option:</p>
                 <div class="text-right">
-                    <p>{{ productOrder.PaymentOption.name }}</p>
-                    <p>{{ productOrder.PaymentOption.price }}{{ valuta }}</p>
+                    <p>{{ paymentOption.name }}</p>
+                    <p>{{ paymentOption.price }}{{ valuta }}</p>
                 </div>
             </div>
         </div>
@@ -79,15 +79,13 @@ const productsCtrl = useProductsSDK()
 const checkoutCtrl = useCheckout()
 const valuta = computed(() => productsCtrl.valuta.value?.short)
 const productOrder = computed(() => checkoutCtrl.productOrder.value)
-const deliveryOptions = computed(() => checkoutCtrl.deliveryOptions.value)
-const paymentOptions = computed(() => checkoutCtrl.paymentOptions.value)
-const deliveryOption = computed(() => checkoutCtrl.productOrder.value.DeliverOption.name)
-const paymentOption = computed(() => checkoutCtrl.productOrder.value.PaymentOption.name)
+const deliveryOption = computed(() => checkoutCtrl.deliveryOptions.value.find(option => option.client_side_uuid === checkoutCtrl.productOrder.value.deliver_option_client_side_uuid))
+const paymentOption = computed(() => checkoutCtrl.paymentOptions.value.find(option => option.client_side_uuid === checkoutCtrl.productOrder.value.payment_option_client_side_uuid))
 
 const totalPrice = computed(() => {
     let price = checkoutCtrl.products.value.reduce((acc, data) => acc + (data.product.price * data.entities.length), 0)
-    price += deliveryOptions.value.find(option => option.name === deliveryOption.value).price
-    price += paymentOptions.value.find(option => option.name === paymentOption.value).price
+    price += deliveryOption.value.price
+    price += paymentOption.value.price
     return price
 })
 </script>

@@ -33,6 +33,7 @@ class AddCheckoutEventListenerCommand extends WebXRHandlerCommand {
             throw new Error('Set a checkoutUI by the SetCheckoutUIInterfaceCommand before adding a listener')
         }
 
+        console.log('Adding event listener', this.type, options)
         options.checkoutUI.addEventListener(this.type, this.callback)
     }
 }

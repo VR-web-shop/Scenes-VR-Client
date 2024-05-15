@@ -1,7 +1,9 @@
-import ShoppingCartSDK from '@vr-web-shop/shopping-cart'
+import { shoppingCartSDK } from '../sdk/shoppingCartSDK.js'
+import { useSceneSDK } from './useScenesSDK.js'
 import { useCheckout } from './useCheckout.js'
 import { useShoppingCart } from './useShoppingCart.js'
 import { ref, toRaw } from 'vue'
+import { v4 as uuidv4 } from 'uuid';
 
 import AddWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/checkout/AddWebXRCheckoutListenerCommand'
 import AddWebXRAddProductListenerCommand from '../shop3D/commands/webxr/checkout/AddWebXRAddProductListenerCommand'
@@ -12,7 +14,7 @@ import RemoveWebXRAddProductListenerCommand from '../shop3D/commands/webxr/check
 
 
 const SERVER_URL = 'http://localhost:3004'
-const sdk = new ShoppingCartSDK(SERVER_URL)
+const sdk = new shoppingCartSDK(SERVER_URL)
 
 class CartToken {
     static get() {
@@ -54,6 +56,7 @@ export function useShoppingCartSDK() {
     // Should not be accessed directly.
     // Use createOrFindCart instead.
     const _cart = ref(null)
+    const _cartProductEntities = ref([])
 
     /**
      * When the shop starts, the shopping cart sdk
@@ -79,18 +82,17 @@ export function useShoppingCartSDK() {
     }
 
     async function loadCart(shop) {
-        const cart = await createOrFindCart();
+        await createOrFindCart();
         
-        if (cart.ProductEntity) {
-            for (const productEntity of cart.ProductEntity) {
-                const { rows } = await sdk.api.ProductEntityController.findAll({
-                    limit: 1,
-                    where: {uuid: productEntity.uuid},
-                    include: [{model: 'Product'}]
-                })
-
-                await shop.invoke(new AddWebXRReservedProductEntitiesCommand(rows[0].Product.uuid, [toRaw(productEntity)]))
-            }
+        const scenesSDK = useSceneSDK()
+        for (const cartProductEntity of _cartProductEntities.value) {
+            const productEntity = await scenesSDK.sdk.api.ProductEntityController.find({ 
+                uuid: cartProductEntity.product_entity_client_side_uuid,
+            })
+            
+            await shop.invoke(new AddWebXRReservedProductEntitiesCommand(
+                productEntity.product_uuid, [toRaw(productEntity)]
+            ))
         }
     }
     
@@ -102,10 +104,10 @@ export function useShoppingCartSDK() {
         const uuid = CartToken.getCartUUID()
         if (uuid) {
             try {
-                _cart.value = await sdk.api.CartController.find({ uuid }, {
-                    customParams: {access_token: CartToken.get()},
-                    include: 'product_entities'
-                })
+                const result = await sdk.Cart.find(uuid, 'cart_product_entities')
+                _cart.value = result.cart;
+                _cartProductEntities.value = result.cart_product_entities;
+
                 return _cart.value
             } catch (error) {
                 console.error('Cart not found', error)
@@ -113,8 +115,11 @@ export function useShoppingCartSDK() {
         }
         
         // Otherwise, create a new cart
-        const {cart, access_token} = await sdk.api.CartController.create({});
-        
+        const { cart, access_token } = await sdk.Cart.create({
+            client_side_uuid: uuidv4(),
+            cart_state_name: "OPEN_FOR_PRODUCT_ENTITIES"
+        });
+
         _cart.value = cart
         CartToken.set(access_token)
 
@@ -135,74 +140,65 @@ export function useShoppingCartSDK() {
 
     async function removeFromCartEvent(event) {
         const productEntitiesInUse = event.data.productEntitiesInUse
-        console.log(productEntitiesInUse)
+        
         await removeProductFromCart(productEntitiesInUse)
         useShoppingCart().reloadCart()
     }
 
     async function addProductToCart(productEntities) {
         const cart = await createOrFindCart()
-        const access_token = CartToken.get()
        
         for (const productEntity of productEntities) {
-            await sdk.api.CartProductEntityController.create({
-                cart_uuid: cart.uuid, 
-                product_entity_uuid: productEntity.uuid,
-                access_token
+            await sdk.CartProductEntity.create({
+                client_side_uuid: uuidv4(),
+                cart_client_side_uuid: cart.client_side_uuid, 
+                product_entity_client_side_uuid: productEntity.uuid
             })
         }
     }
 
     async function removeProductFromCart(productEntitiesInUse) {
         const cart = await createOrFindCart()
-        const access_token = CartToken.get()
-        const refreshedCart = await sdk.api.CartController.find({ uuid: cart.uuid }, {
-            customParams: {access_token: CartToken.get()},
-            include: 'product_entities'
-        })
-
+        const cartProductEntities = _cartProductEntities.value
+        
         for (const productEntity of productEntitiesInUse) {
-            const entity = refreshedCart.ProductEntity.find(entity => entity.uuid === productEntity.uuid)
-
-            await sdk.api.CartProductEntityController.update({
-                uuid: entity.CartProductEntity.uuid,
-                cart_uuid: cart.uuid, 
-                product_entity_uuid: productEntity.uuid,
-                access_token
+            const entity = cartProductEntities.find(entity => {
+                return entity.product_entity_client_side_uuid === productEntity.uuid
             })
-        }
-    }
-
-    async function clearCart() {
-        const cart = await createOrFindCart()
-        const cartProducts = await sdk.api.CartController.find(cart.uuid, {
-            customParams: {access_token: CartToken.get()},
-            include: 'ProductEntity'
-        })
-
-        for (const productEntity of cartProducts.ProductEntities) {
-            await removeProductFromCart(productEntity)
+            
+            await sdk.CartProductEntity.remove({
+                client_side_uuid: entity.client_side_uuid,
+                cart_client_side_uuid: cart.client_side_uuid,
+            })
         }
     }
 
     async function startCheckout() {
         const cart = await createOrFindCart()
         
-        await sdk.api.CartController.update({
-            uuid: cart.uuid,
-            access_token: CartToken.get(),
-            cart_state_name: CART_STATES.WAITING_FOR_CHECKOUT
+        await sdk.Cart.update({
+            client_side_uuid: cart.client_side_uuid,
+            cart_state_name: CART_STATES.WAITING_FOR_CHECKOUT,
+            product_order: {
+                name: 'None',
+                email: 'None',
+                address: 'None',
+                city: 'None',
+                country: 'None',
+                postal_code: 1234,
+                deliver_option_client_side_uuid: 'aaa-bbb-ccc',
+                payment_option_client_side_uuid: 'aaa-bbb-ccc',
+            }
         })
-
+        
         useCheckout().reloadCheckout()
     }
 
     async function cancelCheckout() {
         const cart = await createOrFindCart()
 
-        await sdk.api.CartController.update({
-            uuid: cart.uuid,
-            access_token: CartToken.get(),
+        await sdk.Cart.update({
+            client_side_uuid: cart.client_side_uuid,
             cart_state_name: CART_STATES.OPEN_FOR_PRODUCT_ENTITIES
         })
 
@@ -220,5 +216,6 @@ export function useShoppingCartSDK() {
         getCartToken,
         addProductToCart,
         removeProductFromCart,
+        _cartProductEntities
     }
 }

@@ -1,10 +1,12 @@
 import { ref } from 'vue'
 import { computed } from 'vue'
 import { useShoppingCartSDK } from './useShoppingCartSDK.js'
+import { useSceneSDK } from './useScenesSDK.js'
 import AddWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/checkout/AddWebXRCheckoutListenerCommand.js'
 import RemoveWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/checkout/RemoveWebXRCheckoutListenerCommand.js'
 
 const cart = ref(null)
+const CartProductEntities = ref([])
 const products = ref([])
 const productOrder = ref(null)
 const deliveryOptions = ref([])
@@ -23,60 +25,51 @@ export const useCheckout = () => {
 
     async function loadCart() {
         cart.value = await shoppingCartCtrl.createOrFindCart()
-        cart.value = await shoppingCartCtrl.sdk.api.CartController.find({ uuid: cart.value.uuid }, {
-            customParams: { access_token: shoppingCartCtrl.CartToken.get() },
-            include: 'product_entities'
-        })
+        CartProductEntities.value = shoppingCartCtrl._cartProductEntities.value;
 
         return cart.value
     }
 
     async function loadDeliveryOptions() {
-        const { rows } = await shoppingCartCtrl.sdk.api.DeliverOptionController.findAll({ limit: 100 })
+        const { rows } = await shoppingCartCtrl.sdk.DeliverOption.findAll({ limit: 100 })
         deliveryOptions.value = rows
     }
 
     async function loadPaymentOptions() {
-        const { rows } = await shoppingCartCtrl.sdk.api.PaymentOptionController.findAll({ limit: 100 })
+        const { rows } = await shoppingCartCtrl.sdk.PaymentOption.findAll({ limit: 100 })
         paymentOptions.value = rows
     }
 
     async function loadProductOrder() {
-        const { rows } = await shoppingCartCtrl.sdk.api.ProductOrderController.findAll({
-            limit: 1,
-            where: { 
-                cart_uuid: cart.value.uuid,
-                product_order_state_name: 'WAITING_FOR_PAYMENT' 
-            },
-            include: [
-                { model: 'ProductOrderState' },
-                { model: 'DeliverOption' },
-                { model: 'PaymentOption' }
-            ]
-        })
+        const { product_order } = await shoppingCartCtrl.sdk.Cart.find(cart.value.client_side_uuid, 'product_order');
 
-        productOrder.value = rows[0]
+        productOrder.value = product_order;
     }
 
     async function setupProducts() {
         const duplicatedProductEntities = {}
-        for (const productEntity of cart.value.ProductEntity) {
-            if (duplicatedProductEntities[productEntity.product_uuid]) {
-                duplicatedProductEntities[productEntity.product_uuid].entities.push(productEntity)
+        const scenesSDK = useSceneSDK()
+        for (const cartProductEntity of CartProductEntities.value) {
+
+            if (duplicatedProductEntities[cartProductEntity.product_uuid]) {
+                duplicatedProductEntities[cartProductEntity.product_uuid].entities.push(cartProductEntity)
             } else {
-                const { rows } = await shoppingCartCtrl.sdk.api.ProductEntityController.findAll({
-                    limit: 1,
-                    where: { uuid: productEntity.uuid },
-                    include: [{ model: 'Product' }]
+                const productEntity = await scenesSDK.sdk.api.ProductEntityController.find({ 
+                    uuid: cartProductEntity.product_entity_client_side_uuid,
                 })
+                
+                const product = await scenesSDK.sdk.api.ProductController.find({ 
+                    uuid: productEntity.product_uuid,
+                })
+
+                cartProductEntity.product_uuid = productEntity.product_uuid
     
                 duplicatedProductEntities[productEntity.product_uuid] = {
                     entities: [productEntity],
-                    product: rows[0].Product
+                    product: product
                 }
             }
         }
-        
         
         products.value = Object.values(duplicatedProductEntities)
     }
