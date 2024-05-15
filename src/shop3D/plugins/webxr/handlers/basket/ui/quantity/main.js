@@ -20,7 +20,7 @@ const textColor = 0xFFFFFF
 /**
  * Text options.
  */
-const font = await SpatialUI.SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
+const font = SpatialUI.SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
 const textOptions = { font, size: .03, height: .01 }
 const titleTextValue = 'Select quantity:'
 const increaseTextValue = 'Increase'
