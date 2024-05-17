@@ -7,5 +7,8 @@ export default defineConfig({
   test: {
 	environment: 'jsdom',
 	threads: false,
+  },
+  server: {
+    port: 5174,
   }
 })
