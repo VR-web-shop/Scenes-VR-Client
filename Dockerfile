@@ -1,5 +1,4 @@
-# Use Node.js 14 slim as the base image
-FROM node:14-slim
+FROM node:22-alpine3.18
 
 # Set the working directory in the container
 WORKDIR /app

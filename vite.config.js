@@ -10,5 +10,9 @@ export default defineConfig({
   },
   server: {
     port: 5174,
-  }
+  },
+  build: {
+    outDir: 'dist', // Output directory for the build
+    assetsDir: './', // Relative path for assets
+  },
 })
