@@ -23,10 +23,10 @@ class InitializeState extends State {
      * @returns {void}
      */
     enter(setState) {
-        this.options.plugins.init(this.options.view)
-        setState(new ExecuteState())
-
         const view = this.options.view;
+
+        this.options.plugins.init(view)
+        setState(new ExecuteState())
 
         /**
          * https://threejs.org/manual/#en/webxr-basics

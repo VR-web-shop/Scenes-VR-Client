@@ -20,8 +20,6 @@ const textColor = 0xFFFFFF
 /**
  * Text options.
  */
-const font = SpatialUI.SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
-const textOptions = { font, size: .03, height: .01 }
 const titleTextValue = 'Select quantity:'
 const increaseTextValue = 'Increase'
 const decreaseTextValue = 'Decrease'
@@ -36,7 +34,6 @@ const btnHeight = 0.05
 const btnBggColor = 0xFFFFFF
 const btnHoverColor = 0xCCCDDD
 const btnTextColor = 0x000000
-const btnTextOptions = { font, size: .03, height: .01 }
 
 /**
  * Position options.
@@ -49,6 +46,10 @@ const confirmButtonPosition = new THREE.Vector3(0.15, -0.08, .0001)
 const cancelButtonPosition = new THREE.Vector3(-0.15, -0.08, .0001)
 
 export async function buildQuantityUI() {
+    const font = await SpatialUI.SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
+    const textOptions = { font, size: .03, height: .01 }
+    const btnTextOptions = { font, size: .03, height: .01 }
+
     const parent = new SpatialUI.SpatialUIBuilder()
         /**
          * The background panel.

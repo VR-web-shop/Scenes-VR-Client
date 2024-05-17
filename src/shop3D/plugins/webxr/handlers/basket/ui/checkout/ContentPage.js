@@ -9,8 +9,6 @@ import * as THREE from 'three'
  * Text options.
  */
 const textColor = 0xFFFFFF
-const font = SpatialUI.SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
-const textOptions = { font, size: .05, height: .01 }
 const titleTextValue = 'Content'
 const pagesTextValue = 'Pages'
 const emptyTextValue = 'No items in basket'
@@ -27,7 +25,7 @@ const btnHeight = 0.2
 const btnBggColor = 0xFFFFFF
 const btnHoverColor = 0xCCCDDD
 const btnTextColor = 0x000000
-const btnTextOptions = { font, size: .05, height: .01 }
+
 
 /**
  * Position options.
@@ -67,7 +65,6 @@ const contentElementImgPosition = new THREE.Vector3(-0.08, 0.04, .0001)
  * Content element text options.
  */
 const contentElementTextColor = 0xFFFFFF
-const contentElementTextOptions = { font, size: .03, height: .01 }
 const contentElementTextPosition = new THREE.Vector3(0.0, 0.02, .0001)
 
 /**
@@ -79,18 +76,23 @@ const contentElementBtnColor = 0xFF0000
 const contentElementBtnHoverColor = 0xCCCCCC
 const contentElementBtnText = 'Remove'
 const contentElementBtnTextColor = 0xFFFFFF
-const contentElementBtnTextOptions = { font, size: .03, height: .01 }
 const contentElementBtnPosition = new THREE.Vector3(0, -0.08, .0001)
 
 /**
  * @function buildContentPage
  * @description Build the content page.
- * @returns {void}
+ * @returns {Promise<Object>}
  */
-export function buildContentPage(guiHandler) {
+export async function buildContentPage(guiHandler) {
     if (!guiHandler) {
         throw new Error('The GUI handler is required.')
     }
+
+    const font = await SpatialUI.SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
+    const textOptions = { font, size: .05, height: .01 }
+    const btnTextOptions = { font, size: .05, height: .01 }
+    const contentElementTextOptions = { font, size: .03, height: .01 }
+    const contentElementBtnTextOptions = { font, size: .03, height: .01 }
 
     const content = new SpatialUI.SpatialUIBuilder()
         /**

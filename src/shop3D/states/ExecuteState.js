@@ -22,7 +22,6 @@ class ExecuteState extends State {
      * @returns {void}
      */
     enter(setState) {
-        
     }
 
     /**

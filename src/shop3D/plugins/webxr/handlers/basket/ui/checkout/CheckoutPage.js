@@ -5,8 +5,6 @@ import * as THREE from 'three'
  * Text options.
  */
 const textColor = 0xFFFFFF
-const font = SpatialUI.SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
-const textOptions = { font, size: .05, height: .01 }
 const titleTextValue = 'Checkout'
 const descriptionTextValue = 'Remove your headset to\n complete the purchase'
 const totalTextValue = 'Total:'
@@ -20,7 +18,7 @@ const btnHeight = 0.2
 const btnBggColor = 0xFFFFFF
 const btnHoverColor = 0xCCCDDD
 const btnTextColor = 0x000000
-const btnTextOptions = { font, size: .05, height: .01 }
+
 
 /**
  * Position options.
@@ -33,9 +31,13 @@ const cancelButtonPosition = new THREE.Vector3(0.7, -0.3, .0001)
 /**
  * @function buildCheckoutPage
  * @description Build the checkout page.
- * @returns {void}
+ * @returns {Promise<Object>}
  */
-export function buildCheckoutPage() {
+export async function buildCheckoutPage() {
+    const font = await SpatialUI.SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
+    const textOptions = { font, size: .05, height: .01 }
+    const btnTextOptions = { font, size: .05, height: .01 }
+
     const checkout = new SpatialUI.SpatialUIBuilder()
         /**
          * Create the title text.

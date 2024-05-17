@@ -54,7 +54,7 @@ export function useSceneSDK() {
             {...SceneBasket, uuid: SceneBasket.uuid+'-ph', Mesh: SceneBasket.Placeholder},
             {...SceneBasket, uuid: SceneBasket.uuid+'-pk', Mesh: SceneBasket.Pocket}
         ]);
-
+        
         await WebXrUtils.loadWebXR(
             shop, SceneLights, SceneFloors, SceneProducts, 
             SceneCheckouts, SceneBasket, SceneCharacter

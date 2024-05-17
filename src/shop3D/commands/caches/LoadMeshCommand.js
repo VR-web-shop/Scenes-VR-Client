@@ -44,7 +44,7 @@ class LoadMeshCommand extends Command {
         if (this.name) {
             mesh.name = this.name
         }
-
+        
         options.view.scene.add(mesh)
     }
 }

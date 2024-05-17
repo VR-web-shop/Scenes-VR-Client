@@ -51,8 +51,8 @@ export async function buildBasketUI(guiHandler) {
         throw new Error('The guiHandler must be defined')
     }
 
-    const checkout = buildCheckoutPage()
-    const content = buildContentPage(guiHandler)
+    const checkout = await buildCheckoutPage()
+    const content = await buildContentPage(guiHandler)
     const parent = new SpatialUI.SpatialUIBuilder()
         /**
          * Create the UI's background panel.

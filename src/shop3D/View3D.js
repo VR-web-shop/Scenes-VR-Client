@@ -17,7 +17,8 @@ const rotateThreshold = 0.05
  */
 function _createDefaultScene(rendererOptions) {
     const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    const camera = new THREE.PerspectiveCamera(75, 
+        window.innerWidth / window.innerHeight, 0.1, 1000)
     const renderer = new THREE.WebGLRenderer(rendererOptions)
 	renderer.toneMapping = THREE.ACESFilmicToneMapping
 	return { scene, camera, renderer }
@@ -58,7 +59,8 @@ class View3D extends View {
 		const rendererOptions = { antialias: true }
 		if (canvas) rendererOptions.canvas = canvas
         
-		const data = this.createDefaultScene(canvas)
+		const data = this.createDefaultScene({canvas, antialias: true})
+        
 		this.scene = data.scene;
 		this.camera = data.camera;
 		this.renderer = data.renderer;
