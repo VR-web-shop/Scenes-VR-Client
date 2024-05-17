@@ -20,7 +20,7 @@ import RemoveWebXRProductEntitiesCommand from '../shop3D/commands/webxr/checkout
 import { useWebsocket } from './useWebsocket.js';
 import { ref } from 'vue';
 
-const SERVER_URL = 'http://localhost:3003'
+const SERVER_URL = import.meta.env.VITE_SCENES_SERVER_URL
 const sdk = new SceneSDK(SERVER_URL)
 const ws = useWebsocket();
 let eventHandler = null;

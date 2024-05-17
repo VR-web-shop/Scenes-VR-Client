@@ -13,7 +13,7 @@ import RemoveWebXRCheckoutListenerCommand from '../shop3D/commands/webxr/checkou
 import RemoveWebXRAddProductListenerCommand from '../shop3D/commands/webxr/checkout/RemoveWebXRAddProductListenerCommand'
 
 
-const SERVER_URL = 'http://localhost:3004'
+const SERVER_URL = import.meta.env.VITE_SHOPPING_CART_SERVER_URL
 const sdk = new shoppingCartSDK(SERVER_URL)
 
 class CartToken {

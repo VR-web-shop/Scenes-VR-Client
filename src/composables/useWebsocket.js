@@ -1,6 +1,6 @@
 import W3CWebSocket from 'websocket';
 import * as THREE from 'three';
-const URL = 'ws://localhost:8080';
+const URL = import.meta.env.VITE_SCENES_WEBSOCKET_URL;
 const PROTOCOL = 'echo-protocol';
 const client = new W3CWebSocket.w3cwebsocket(URL, PROTOCOL);
 const eventDispatcher = new THREE.EventDispatcher();
