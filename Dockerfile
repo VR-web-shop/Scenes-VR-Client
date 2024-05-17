@@ -13,6 +13,7 @@ COPY .npmrc* ./
 
 # Install dependencies
 RUN npm install
+RUN npm install -g serve
 
 # Copy the rest of the application code to the working directory
 COPY . .
@@ -24,4 +25,4 @@ RUN npm run build
 EXPOSE 5174
 
 # Define the command to serve your built static files
-CMD ["npx", "serve", "-s", "build", "-l", "5174"]
+CMD ["npx", "serve", "-s", "dist", "-l", "5174"]
