@@ -1,7 +1,8 @@
 import { useToast } from "../composables/useToast.js"
 
 const toast = useToast()
-const SERVER_URL = 'http://localhost:3004/api/v1'
+const SERVER_URL = `${import.meta.env.VITE_SHOPPING_CART_SERVER_URL}/api/v1`
+
 
 export function shoppingCartSDK() {
     const request = async (endpoint, method='GET', body=null, useCartAuth=false) => {
