@@ -28,7 +28,7 @@
                     We have a wide range of products to suit your needs. Find the right gear for you below.
                 </p>
 
-                <Paginator :findAllMethod="sdk.api.ProductController.findAll" :include="[{model:'ProductEntities'}]" :limit="10">
+                <Paginator :findAllMethod="sdk.Product.findAll" :limit="10">
                     <template #empty>
                         <div class="text-center">
                             <p>No products found</p>
@@ -37,13 +37,13 @@
 
                     <template #default="{ entities }">
                         <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
-                            <div v-for="product in entities" :key="product.uuid"
+                            <div v-for="product in entities" :key="product.client_side_uuid"
                                 class="border border-gray-300 rounded-md p-8 bg-gray-300">
                                 <div>
                                     <Product :product="product" />
 
                                     <div>
-                                        <router-link :to="{ name: 'Product', params: { uuid: product.uuid } }"  class="text-white px-5 py-1 rounded-md w-full bg-blue-500 block text-center text-sm">
+                                        <router-link :to="{ name: 'Product', params: { client_side_uuid: product.client_side_uuid } }"  class="text-white px-5 py-1 rounded-md w-full bg-blue-500 block text-center text-sm">
                                             View product
                                         </router-link>
                                     </div>
@@ -59,7 +59,7 @@
 
 <script setup>
 import Product from '../components/products/Product.vue';
-import Paginator from '../components/Paginator.vue';
+import Paginator from '../components/PaginatorScenes.vue';
 import { useSceneSDK } from '../composables/useScenesSDK.js';
 const { sdk } = useSceneSDK();
 </script>

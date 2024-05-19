@@ -11,9 +11,7 @@ import { ref, onBeforeMount } from 'vue';
 const { sdk } = useSceneSDK();
 const noOfProducts = ref(0);
 onBeforeMount(async () => {
-    const { count } = await sdk.api.ProductController.findAll({
-        limit: 100,
-    });
+    const { count } = await sdk.Product.findAll(1, 100);
     noOfProducts.value = count;
 });
 </script>

@@ -13,7 +13,7 @@ import Cookies from './pages/Cookies.vue'
 const routes = [
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
     { path: '/', component: Home, name: 'Home' },
-    { path: '/product/:uuid', component: Product, name: 'Product' },
+    { path: '/product/:client_side_uuid', component: Product, name: 'Product' },
     { path: '/products', component: Products, name: 'Products' },
     { path: '/contact', component: Contact, name: 'Contact' },
     { path: '/about', component: About, name: 'About' },
