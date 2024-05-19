@@ -1,4 +1,5 @@
 import SceneSDK from '@vr-web-shop/scenes'
+import readscene from '../utils/readscene.js'
 
 import SetCameraCommand from '../shop3D/commands/view/SetCameraCommand.js';
 import SetSceneBggCommand from '../shop3D/commands/view/SetSceneBggCommand.js';
@@ -21,12 +22,13 @@ import { useWebsocket } from './useWebsocket.js';
 import { ref } from 'vue';
 
 const SERVER_URL = import.meta.env.VITE_SCENES_SERVER_URL
-const sdk = new SceneSDK(SERVER_URL)
+const sdk = SceneSDK(SERVER_URL)
 const ws = useWebsocket();
 let eventHandler = null;
 
 const noOfProducts = ref(0);
 const products = ref([]);
+
 
 export function useSceneSDK() {
 
@@ -35,29 +37,41 @@ export function useSceneSDK() {
      * will load scene and its assets.
      */
     async function start(shop) {
-        const scene = await findActiveScene();
+        const scene = await readscene();
+        console.log('Scene:', scene);
         const {
-            SceneBackground, SceneBasket, SceneCheckouts,
-            SceneFloors, SceneStaticObjects, SceneLights,
-            SceneCamera, SceneProducts, SceneCharacter
+            scene_background, 
+            scene_basket,
+            scene_checkouts,
+            scene_floors,
+            scene_static_objects,
+            scene_lights,
+            scene_camera,
+            scene_products,
+            scene_character
         } = scene;
 
-        await shop.invoke(new SetCameraCommand(SceneCamera.Position, SceneCamera.Rotation));
-        await shop.invoke(new SetSceneBggCommand({ color: SceneBackground.hex }));
+        await shop.invoke(new SetCameraCommand(
+            scene_camera.position_client_side_uuid, 
+            scene_camera.rotation_client_side_uuid
+        ));
+        await shop.invoke(new SetSceneBggCommand({ 
+            color: scene_background.hex 
+        }));
 
         await MeshUtils.loadMeshes(shop, [
-            ...SceneStaticObjects, 
-            ...SceneProducts, 
-            ...SceneFloors,
-            ...SceneCheckouts,
-            {...SceneBasket, Mesh: SceneBasket.Object},
-            {...SceneBasket, uuid: SceneBasket.uuid+'-ph', Mesh: SceneBasket.Placeholder},
-            {...SceneBasket, uuid: SceneBasket.uuid+'-pk', Mesh: SceneBasket.Pocket}
+            ...scene_static_objects, 
+            ...scene_products, 
+            ...scene_floors,
+            ...scene_checkouts,
+            {...scene_basket, mesh_client_side_uuid: scene_basket.object_client_side_uuid},
+            {...scene_basket, client_side_uuid: scene_basket.client_side_uuid+'-ph', mesh_client_side_uuid: scene_basket.placeholder_client_side_uuid},
+            {...scene_basket, client_side_uuid: scene_basket.client_side_uuid+'-pk', mesh_client_side_uuid: scene_basket.pocket_client_side_uuid},
         ]);
         
         await WebXrUtils.loadWebXR(
-            shop, SceneLights, SceneFloors, SceneProducts, 
-            SceneCheckouts, SceneBasket, SceneCharacter
+            shop, scene_lights, scene_floors, scene_products, 
+            scene_checkouts, scene_basket, scene_character
         );
 
         eventHandler = new WebXREvents(shop);
@@ -67,8 +81,8 @@ export function useSceneSDK() {
         ws.addEventListener(ws.EVENTS.SCENES_UPDATE_PRODUCT_ENTITY, eventHandler.onUpdateSceneProductEntity.bind(eventHandler));
         ws.addEventListener(ws.EVENTS.SCENES_DELETE_PRODUCT_ENTITY, eventHandler.onDeleteSceneProductEntity.bind(eventHandler));
     
-        noOfProducts.value = SceneProducts.length;
-        products.value = SceneProducts;
+        noOfProducts.value = scene_products.length;
+        products.value = scene_products;
     }
 
     async function exit(shop) {
@@ -82,19 +96,7 @@ export function useSceneSDK() {
     }
 
     async function findActiveScene() {
-        const { rows } = await sdk.api.SceneController.findAll({
-            limit: 100, where: { active: 1 }, include: [
-                { model: 'SceneCamera', include: ['Position', 'Rotation'] },
-                { model: 'SceneLights', include: ['Position', 'Rotation'] },
-                { model: 'SceneStaticObjects', include: ['Position', 'Rotation', 'Scale', 'Mesh'] },
-                { model: 'SceneFloors', include: ['Position', 'Rotation', 'Scale', 'Mesh'] },
-                { model: 'SceneBasket', include: ['Position', 'Rotation', 'Scale', 'Object', 'Placeholder', 'Pocket', 'ObjectOffset', 'PlaceholderOffset', 'PocketOffset', 'InsertAreaOffset', 'InsertAreaSize'] },
-                { model: 'SceneCheckouts', include: ['Position', 'Rotation', 'Scale', 'SurfaceOffset', 'SurfaceSize', 'UIOffsetPosition', 'UIOffsetRotation', 'UIScale', 'Mesh'] },
-                { model: 'SceneProducts', include: ['Position', 'Rotation', 'Scale', 'UIOffsetPosition', 'UIOffsetRotation', 'UIScale', 'Mesh', 'Product'] },                
-                { model: 'SceneCharacter', include: ['Position', 'Rotation']},
-                { model: 'SceneBackground' },
-            ]
-        });
+        const { rows } = await sdk.Scene.active()
 
         if (rows.length === 0) {
             throw new Error(`Scene with UUID ${sceneUUID} not found`);
@@ -113,19 +115,25 @@ export function useSceneSDK() {
 }
 
 class MeshUtils {
-    static async buildSubmeshes(mesh_uuid) {
-        const { rows } = await sdk.api.MeshController.findAll({ 
-            limit: 1000, 
-            where: { uuid: mesh_uuid }, 
-            include: [{ model: 'Material.Texture' }] 
-        });
+    static async buildSubmeshes(mesh_materials) {
+        const { rows: materials } = await sdk.Material.findAll(1, 1000);
+        const { rows: textures } = await sdk.Texture.findAll(1, 1000);
 
-        const submeshes = rows[0].Material.map(m => {
+        const submeshes = mesh_materials.map(m => {
+            const material = materials.find(mat => mat.client_side_uuid === m.material_client_side_uuid);
+            let mesh_textures = [];
+            if (material.material_textures) {
+                mesh_textures = material.material_textures.map(t => {
+                    const _res = textures.find(tex => tex.client_side_uuid === t.texture_client_side_uuid)
+                    return _res;
+                });
+            }
+
             return {
-                name: m.MeshMaterial.submesh_name,
+                name: m.submesh_name,
                 material: {
-                    type: m.material_type_name,
-                    textures: m.Texture.map(t => {
+                    type: material.material_type_name,
+                    textures: mesh_textures.map(t => {
                         return {
                             type: t.texture_type_name,
                             src: t.source
@@ -139,20 +147,26 @@ class MeshUtils {
     }
 
     static async loadMeshes(shop, meshObjects) {
+        const { rows: meshes } = await sdk.Mesh.findAll(1, 1000);
+
         for (const object of meshObjects) {
-            if (!object.Mesh) {
+            if (!object.mesh_client_side_uuid) {
                 console.log('Object does not have a mesh', object);
                 continue;
             }
 
-            const submeshes = await MeshUtils.buildSubmeshes(object.Mesh.uuid);
+            const mesh = meshes.find(m => m.client_side_uuid === object.mesh_client_side_uuid);
+            const submeshes = mesh.mesh_materials
+                ? await MeshUtils.buildSubmeshes(mesh.mesh_materials)
+                : [];
+
             await shop.invoke(new LoadMeshCommand(
-                object.Mesh.source,
+                mesh.source,
                 submeshes,
-                object.Position,
-                object.Rotation,
-                object.Scale,
-                object.uuid
+                object.position_client_side_uuid,
+                object.rotation_client_side_uuid,
+                object.scale_client_side_uuid,
+                object.client_side_uuid
             ));
         }
     }
@@ -161,7 +175,10 @@ class MeshUtils {
 class WebXrUtils {
     static async loadCharacter(shop, character) {
         if (!character) return;
-        await shop.invoke(new SetWebXRStartPositionCommand(character.Position, character.Rotation));
+        await shop.invoke(new SetWebXRStartPositionCommand(
+            character.position_client_side_uuid, 
+            character.rotation_client_side_uuid
+        ));
     }
 
     static async loadLights(shop, lights) {
@@ -169,9 +186,9 @@ class WebXrUtils {
         for (const light of lights) {
             await shop.invoke(new LoadLightCommand(
                 light.scene_light_type_name,
-                light.hexColor,
+                light.hex_color,
                 light.intensity,
-                light.Position,
+                light.position_client_side_uuid,
                 light.uuid
             ));
         }
@@ -180,33 +197,26 @@ class WebXrUtils {
     static async loadFloors(shop, floors) {
         if (!floors) return;
         for (const floor of floors) {
-            await shop.invoke(new AddWebXRFloorCommand({ name: floor.uuid }));
+            await shop.invoke(new AddWebXRFloorCommand({ name: floor.client_side_uuid }));
         }
     }
 
     static async loadProducts(shop, products) {
         if (!products) return;
         for (const product of products) {
-            if (product.Mesh === null) {
+            if (!product.mesh_client_side_uuid) {
                 continue;
             }
-
-            const { rows: productEntities } = await sdk.api.ProductEntityController.findAll({
-                limit: 100,
-                where: {
-                    product_uuid: product.Product.uuid,
-                    product_entity_state_name: 'AVAILABLE_FOR_PURCHASE'
-                }
-            });
+            const productEntities = product.product_entities || [];
             
             await shop.invoke(new AddWebXRSelectableCommand(
-                { name: product.uuid }, 
-                product.Product.uuid, 
-                product.Product, 
+                { name: product.client_side_uuid }, 
+                product.client_side_uuid, 
+                product, 
                 productEntities,
-                product.UIOffsetPosition,
-                product.UIOffsetRotation,
-                product.UIScale,
+                product.ui_offset_position_client_side_uuid,
+                product.ui_offset_rotation_client_side_uuid,
+                product.ui_scale_client_side_uuid,
             ));
         }
     }
@@ -214,12 +224,12 @@ class WebXrUtils {
     static async loadCheckouts(shop, checkouts) {
         if (!checkouts) return;
         for (const checkout of checkouts) {
-            await shop.invoke(new AddWebXRCheckoutCommand({ name: checkout.uuid },
-                checkout.SurfaceOffset,
-                checkout.SurfaceSize,
-                checkout.UIOffsetPosition,
-                checkout.UIOffsetRotation,
-                checkout.UIScale,
+            await shop.invoke(new AddWebXRCheckoutCommand({ name: checkout.client_side_uuid },
+                checkout.surface_offset_client_side_uuid,
+                checkout.surface_size_client_side_uuid,
+                checkout.ui_offset_position_client_side_uuid,
+                checkout.ui_offset_rotation_client_side_uuid,
+                checkout.ui_scale_client_side_uuid,
             ));
         }
     }
@@ -227,15 +237,15 @@ class WebXrUtils {
     static async loadBasket(shop, basket) {
         if (!basket) return;
         await shop.invoke(new AddWebXRBasketCommand(
-            { name: basket.uuid },
-            { name: basket.uuid + '-ph' },
-            { name: basket.uuid + '-pk' },
-            basket.uuid,
-            basket.ObjectOffset,
-            basket.PlaceholderOffset,
-            basket.PocketOffset,
-            basket.InsertAreaOffset,
-            basket.InsertAreaSize
+            { name: basket.client_side_uuid },
+            { name: basket.client_side_uuid + '-ph' },
+            { name: basket.client_side_uuid + '-pk' },
+            basket.client_side_uuid,
+            basket.object_offset_client_side_uuid,
+            basket.placeholder_offset_client_side_uuid,
+            basket.pocket_offset_client_side_uuid,
+            basket.insert_area_offset_client_side_uuid,
+            basket.insert_area_size_client_side_uuid
         ));
     }
 

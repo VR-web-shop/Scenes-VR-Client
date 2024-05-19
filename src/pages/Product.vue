@@ -11,12 +11,11 @@ import { router } from '../router.js';
 import { ref, onBeforeMount } from 'vue';
 
 const { sdk } = useSceneSDK();
-const uuid = router.currentRoute.value.params.uuid;
+const client_side_uuid = router.currentRoute.value.params.client_side_uuid;
 const product = ref(null);
 
 onBeforeMount(async () => {
-    product.value = await sdk.api.ProductController.find({ uuid }, {
-        include: 'product_entities'
-    });
+    product.value = await sdk.Product.find( client_side_uuid );
+    console.log(product.value);
 });
 </script>

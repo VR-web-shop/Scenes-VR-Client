@@ -38,9 +38,10 @@ const addedToCart = (productEntities) => {
 }
 const availableForPurchase = computed(() => {
     const a = []
-    for (let i = 0; i < props.product.ProductEntities.length; i++) {
-        if (props.product.ProductEntities[i].product_entity_state_name === 'AVAILABLE_FOR_PURCHASE') {
-            a.push(props.product.ProductEntities[i])
+    if (!props.product.product_entities) return a
+    for (let i = 0; i < props.product.product_entities.length; i++) {
+        if (props.product.product_entities[i].product_entity_state_name === 'AVAILABLE_FOR_PURCHASE') {
+            a.push(props.product.product_entities[i])
         }
     }
     return a

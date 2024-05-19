@@ -20,12 +20,7 @@ const valuta = computed(() => productsSDK.valuta.value?.short)
 const { sdk } = useSceneSDK();
 const products = ref([]);
 const reloadProducts = async () => {
-    const { count, rows } = await sdk.api.ProductController.findAll({
-        limit: 100,
-        include: [
-            { model: 'ProductEntities' }
-        ]
-    });
+    const { count, rows } = await sdk.Product.findAll(1, 1000);
 
     if (count === 0) return
     const r = []

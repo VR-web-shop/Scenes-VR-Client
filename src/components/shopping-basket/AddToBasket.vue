@@ -31,14 +31,18 @@ const props = defineProps({
 })
 
 const min = 1;
-const max = props.product.ProductEntities.length;
+const max = props.product.product_entities ? props.product.product_entities.length : 1;
 const quantity = ref(min);
 const shoppingCartSDK = useShoppingCartSDK();
 const shoppingCart = useShoppingCart();
 const toast = useToast();
 
 const addToCart = async () => {
-    const productEntities = props.product.ProductEntities.slice(0, quantity.value);
+    const entities = props.product.product_entities 
+        ? props.product.product_entities
+        : [];
+
+    const productEntities = entities.slice(0, quantity.value);
     await shoppingCartSDK.addProductToCart(productEntities);
     await shoppingCart.reloadCart();
     toast.add('Product added to cart', 5000, 'success');

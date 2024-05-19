@@ -300,6 +300,7 @@ class SelectableProduct extends Selectable {
 
     static async buildUI(selectableProduct, uiPosition, uiRotation, uiScale) {
         if (!font) font = await SpatialUIText.loadFont('fonts/helvetiker_regular.typeface.json')
+
         const textOptions = { font, size: 0.05, height: 0.01 }
         const nameText = new SpatialUIText("{name}", textOptions, 0x000000)
         const priceText = new SpatialUIText("{price}", textOptions, 0x000000)
@@ -338,7 +339,8 @@ class SelectableProduct extends Selectable {
         scene.add(wrapper)
     
         const updateUI = () => {
-            let { name, price } = selectableProduct.product
+            let { name, price } = selectableProduct.product.product
+            
             price = parseFloat(price)
             const show = selectableProduct.getAvailableProductEntities().length > 0
             

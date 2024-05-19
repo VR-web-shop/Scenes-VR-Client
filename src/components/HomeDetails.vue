@@ -197,10 +197,6 @@
                     <img src="/images/USB.png" alt="Chairs" class="w-full" />
 
                 </div>
-
-                <div>
-                    <CustomUSBProducts />
-                </div>
             </div>
         </div>
 
@@ -230,6 +226,5 @@ import VRIcon from '../components/icons/VRIcon.vue';
 import BasketIcon from '../components/icons/BasketIcon.vue';
 import TruckIcon from '../components/icons/TruckIcon.vue';
 import RandomProducts from './products/RandomProducts.vue';
-import CustomUSBProducts from './products/CustomUSBProducts.vue';
 import StartVRButton from './VR/StartVRButton.vue';
 </script>
