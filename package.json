@@ -12,7 +12,7 @@
   "dependencies": {
     "@vr-web-shop/auth": "1.0.38",
     "@vr-web-shop/products": "1.0.13",
-    "@vr-web-shop/scenes": "1.0.61",
+    "@vr-web-shop/scenes": "1.0.62",
     "@vr-web-shop/shopping-cart": "1.0.13",
     "jsdom": "^24.0.0",
     "three": "^0.162.0",
