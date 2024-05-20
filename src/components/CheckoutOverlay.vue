@@ -94,6 +94,7 @@ import { useCheckout } from '../composables/useCheckout.js';
 import { useShoppingCartSDK } from '../composables/useShoppingCartSDK';
 import { useToast } from '../composables/useToast.js';
 import { ref, toRaw, computed, onBeforeMount } from 'vue'
+import { v4 } from 'uuid';
 
 const STEPS = {
     overview: 'overview',
@@ -139,22 +140,20 @@ const submitDeliveryOption = (deliverOptionParams) => {
 const submitPaymentMethod = async (paymentOptionsParams) => {
     const cart = await shoppingCartCtrl.createOrFindCart();
     const req = {
-        cart_uuid: cart.uuid,
+        cart_client_side_uuid: cart.client_side_uuid,
         ...toRaw(params.value),
         ...toRaw(paymentOptionsParams),
-        responseInclude: [
-            { model: 'ProductOrderState' },
-            { model: 'DeliverOption' },
-            { model: 'PaymentOption' }
-        ]
     }
 
     let order;
     if (productOrder.value) {
-        req.uuid = productOrder.value.uuid
-        order = await shoppingCartCtrl.sdk.api.ProductOrderController.update(req)
+        req.client_side_uuid = productOrder.value.client_side_uuid
+        req.product_order_state_name = productOrder.value.product_order_state_name
+        order = await shoppingCartCtrl.sdk.ProductOrder.update(req)
     } else {
-        order = await shoppingCartCtrl.sdk.api.ProductOrderController.create(req)
+        req.client_side_uuid = v4()
+        req.product_order_state_name = 'WAITING_FOR_PAYMENT'
+        order = await shoppingCartCtrl.sdk.ProductOrder.create(req)
     }
     
     checkoutCtrl.setProductOrder(order)
@@ -168,7 +167,7 @@ const cancelPurchase = async () => {
 }
 
 const goToPayment = () => {
-    if (productOrder.value.PaymentOption.name === 'Credit Card') {
+    if (productOrder.value.payment_option_client_side_uuid === 'aaa-bbb-ccc') {
         setStep(STEPS.card_information)      
     } else {
         showSuccess()
@@ -179,9 +178,20 @@ const showSuccess = async () => {
     setStep(STEPS.checkout_success)
     toastCtrl.add('Purchase completed', 5000, 'success')
 
-    const r = await shoppingCartCtrl.sdk.api.ProductOrderController.update({
-        uuid: productOrder.value.uuid,
-        product_order_state_name: 'WAITING_FOR_SHIPMENT'
+    const cart = await shoppingCartCtrl.createOrFindCart()
+
+    const r = await shoppingCartCtrl.sdk.ProductOrder.update({
+        client_side_uuid: productOrder.value.client_side_uuid,
+        name: productOrder.value.name,
+        email: productOrder.value.email,
+        address: productOrder.value.address,
+        city: productOrder.value.city,
+        postal_code: productOrder.value.postal_code,
+        country: productOrder.value.country,
+        payment_option_client_side_uuid: productOrder.value.payment_option_client_side_uuid,
+        deliver_option_client_side_uuid: productOrder.value.deliver_option_client_side_uuid,
+        product_order_state_name: 'WAITING_FOR_SHIPMENT',
+        cart_client_side_uuid: cart.client_side_uuid
     })
 
     setTimeout(() => {

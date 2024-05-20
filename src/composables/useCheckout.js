@@ -54,13 +54,13 @@ export const useCheckout = () => {
             if (duplicatedProductEntities[cartProductEntity.product_uuid]) {
                 duplicatedProductEntities[cartProductEntity.product_uuid].entities.push(cartProductEntity)
             } else {
-                const productEntity = await scenesSDK.sdk.api.ProductEntityController.find({ 
-                    uuid: cartProductEntity.product_entity_client_side_uuid,
-                })
+                const productEntity = await scenesSDK.sdk.ProductEntity.find( 
+                    cartProductEntity.product_entity_client_side_uuid,
+                )
                 
-                const product = await scenesSDK.sdk.api.ProductController.find({ 
-                    uuid: productEntity.product_uuid,
-                })
+                const product = await scenesSDK.sdk.Product.find( 
+                    productEntity.product_client_side_uuid,
+                )
 
                 cartProductEntity.product_uuid = productEntity.product_uuid
     
@@ -79,6 +79,7 @@ export const useCheckout = () => {
 
         const isNotWaitingForCheckout = cart.value.cart_state_name !== 'WAITING_FOR_CHECKOUT'
         if (isNotWaitingForCheckout) {
+            console.log('Cart is not waiting for checkout')
             return
         }
 

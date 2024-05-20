@@ -152,7 +152,7 @@ export function useShoppingCartSDK() {
             await sdk.CartProductEntity.create({
                 client_side_uuid: uuidv4(),
                 cart_client_side_uuid: cart.client_side_uuid, 
-                product_entity_client_side_uuid: productEntity.uuid
+                product_entity_client_side_uuid: productEntity.client_side_uuid
             })
         }
     }
