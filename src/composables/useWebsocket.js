@@ -4,7 +4,7 @@ const URL = import.meta.env.VITE_SCENES_WEBSOCKET_URL;
 const PROTOCOL = 'echo-protocol';
 const client = new W3CWebSocket.w3cwebsocket(URL, PROTOCOL);
 const eventDispatcher = new THREE.EventDispatcher();
-
+console.log('URL:', URL);
 client.onerror = function() {
     console.log('Connection Error');
 };

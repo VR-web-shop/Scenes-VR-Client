@@ -30,12 +30,12 @@ export function useShoppingCart() {
         const { sdk: scenesSDK } = useSceneSDK()
         for (const cartProductEntity of cartProductEntities) {
 
-            const productEntity = await scenesSDK.api.ProductEntityController.find({ 
-                uuid: cartProductEntity.product_entity_client_side_uuid,
-            })
+            const productEntity = await scenesSDK.ProductEntity.find( 
+                cartProductEntity.product_entity_client_side_uuid,
+            )
             
             const exist = productsArr.find(p => {
-                return p.uuid === productEntity.product_uuid
+                return p.client_side_uuid === productEntity.product_client_side_uuid
             })
     
             if (exist) {
@@ -44,9 +44,9 @@ export function useShoppingCart() {
                 continue
             }
             
-            const product = await scenesSDK.api.ProductController.find({ 
-                uuid: productEntity.product_uuid,
-            })
+            const product = await scenesSDK.Product.find( 
+                productEntity.product_client_side_uuid,
+            )
 
             productsArr.push({ 
                 ...product, 

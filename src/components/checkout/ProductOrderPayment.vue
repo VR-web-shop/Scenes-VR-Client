@@ -8,7 +8,7 @@
                     <div class="text-gray-500">Price: {{ option.price }} {{ valuta }}</div>
                 </div>
                 <div>
-                    <input type="radio" v-model="paymentOption" :value="option.name" />
+                    <input type="radio" v-model="paymentOption" :value="option.client_side_uuid" />
                 </div>
             </div>
         </div>
@@ -58,13 +58,13 @@ const submit = () => {
     }
 
     props.nextStep({
-        payment_option_name: paymentOption.value
+        payment_option_client_side_uuid: paymentOption.value
     })
 }
 
 onBeforeMount(async () => {
     if (productOrder.value) {
-        paymentOption.value = productOrder.value.PaymentOption.name
+        paymentOption.value = productOrder.value.payment_option_client_side_uuid
     }
 })
 </script>

@@ -41,6 +41,11 @@ const addToCart = async () => {
     const entities = props.product.product_entities 
         ? props.product.product_entities
         : [];
+    if (!props.product.product_entities 
+     || props.product.product_entities && entities.length === 0) {
+        toast.add('The product is out of stock', 5000, 'warning');
+        return;
+    }
 
     const productEntities = entities.slice(0, quantity.value);
     await shoppingCartSDK.addProductToCart(productEntities);

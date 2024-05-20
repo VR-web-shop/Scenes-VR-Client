@@ -106,11 +106,21 @@ export function shoppingCartSDK() {
         addIDToSingular: true,
     })
 
+    const ProductOrder = api('/product_orders', '/product_order', 'client_side_uuid', {
+        find: { useCartAuth: true },
+        findAll: { useCartAuth: true },
+        create: { useCartAuth: true },
+        update: { useCartAuth: true },
+        remove: { useCartAuth: true },
+        addIDToSingular: false,
+    })
+
     return {
         Cart,
         CartProductEntity,
         CartState,
         DeliverOption,
         PaymentOption,
+        ProductOrder,
     }
 }
