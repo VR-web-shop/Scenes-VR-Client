@@ -6,6 +6,7 @@ export default class ContentManager {
     }
 
     async addContentObject(contentObject) {
+        console.log('ContentManager.addContentObject', contentObject, this.contentObjects)
         this.contentObjects.push(contentObject)
         await this.onAddContentObject(contentObject)
     }

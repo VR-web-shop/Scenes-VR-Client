@@ -33,7 +33,7 @@ class AddProductCommand extends WebXRHandlerCommand {
      */
     async execute(options) {
         for (const checkoutProduct of options.checkoutProducts) {
-            if (checkoutProduct.selectableProduct.product.uuid === this.selectableProduct.product.uuid) {
+            if (checkoutProduct.selectableProduct.product.client_side_uuid === this.selectableProduct.product.client_side_uuid) {
                 if (this.castEvent) options.dispatchEvent('addProduct', checkoutProduct)
                 return;
             }

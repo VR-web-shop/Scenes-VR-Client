@@ -5,6 +5,11 @@ import RemoveProductCommand from '../../basket/commands/RemoveProductCommand.js'
 import ShowQuantityUICommand from '../../basket/commands/ShowQuantityUICommand.js'
 import SpatialUIText from '../../gui/spatialui/elements/SpatialUIText.js'
 import * as THREE from 'three'
+import { useProductsSDK } from '../../../../../../composables/useProductsSDK.js'
+import { computed } from 'vue'
+
+const useProducts = useProductsSDK()
+const valutaComputed = computed(()=>useProducts.valuta?.value)
 
 let valuta = { name: 'Euro', short: 'EUR', symbol: '€', active: false }
 let font = null
@@ -29,15 +34,15 @@ class SelectableProduct extends Selectable {
     }
 
     getPrice() {
-        return this.product.price
+        return this.product.product.price
     }
 
     getValuta() {
-        return valuta
+        return valutaComputed.value
     }
 
     getImageSource() {
-        return this.product.thumbnail_source
+        return this.product.product.thumbnail_source
     }
 
     setOutOfStockEffect() {
@@ -110,11 +115,11 @@ class SelectableProduct extends Selectable {
     }
 
     isProductEntityReserved(productEntity) {
-        return this.productEntitiesInUse.find(entity => entity.uuid === productEntity.uuid)
+        return this.productEntitiesInUse.find(entity => entity.client_side_uuid === productEntity.client_side_uuid)
     }
 
     isProductEntityExistent(productEntity) {
-        return this.productEntities.find(entity => entity.uuid === productEntity.uuid)
+        return this.productEntities.find(entity => entity.client_side_uuid === productEntity.client_side_uuid)
     }
 
     /**
@@ -128,7 +133,7 @@ class SelectableProduct extends Selectable {
             this.product = options.updateProduct
             this.ui?.updateUI()
         }
-
+    
         // Note: order matters. Always add before reserve.
         if (options.addProductEntities) {
             for (let i = 0; i < options.addProductEntities.length; i++) {
@@ -139,6 +144,7 @@ class SelectableProduct extends Selectable {
                 this.productEntities.push(options.addProductEntities[i])
                 
             }
+      
             // If the mesh is hidden and this update doesn't add
             // reserved product entities, then show the mesh.
             this.setOutOfStockEffect()
@@ -157,6 +163,7 @@ class SelectableProduct extends Selectable {
                     this.productEntities.splice(index, 1)
                 }
             }
+            console.log('SelectableProduct.onUpdate', this)
             
             // if the mesh is shown and it has no product entities, then hide the mesh.
             this.setOutOfStockEffect()

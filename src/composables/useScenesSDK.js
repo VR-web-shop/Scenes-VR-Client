@@ -38,7 +38,7 @@ export function useSceneSDK() {
      */
     async function start(shop) {
         const scene = await readscene();
-        console.log('Scene:', scene);
+        const { rows: product_entities } = await sdk.ProductEntity.findAll(1, 1000);
         const {
             scene_background, 
             scene_basket,
@@ -50,6 +50,12 @@ export function useSceneSDK() {
             scene_products,
             scene_character
         } = scene;
+
+        // Setup products with their entities
+        for (const sceneProduct of scene_products) {
+            const productEntities = product_entities.filter(pe => pe.product_client_side_uuid === sceneProduct.product_client_side_uuid);
+            sceneProduct.product_entities = productEntities;
+        }
 
         await shop.invoke(new SetCameraCommand(
             scene_camera.position_client_side_uuid, 
@@ -75,6 +81,7 @@ export function useSceneSDK() {
         );
 
         eventHandler = new WebXREvents(shop);
+        
         ws.addEventListener(ws.EVENTS.SCENES_UPDATE_SCENE_PRODUCT, eventHandler.onUpdateSceneProduct.bind(eventHandler));
         ws.addEventListener(ws.EVENTS.SCENES_DELETE_SCENE_PRODUCT, eventHandler.onDeleteSceneProduct.bind(eventHandler));
         ws.addEventListener(ws.EVENTS.SCENES_NEW_PRODUCT_ENTITY, eventHandler.onNewSceneProductEntity.bind(eventHandler));
@@ -211,7 +218,7 @@ class WebXrUtils {
             
             await shop.invoke(new AddWebXRSelectableCommand(
                 { name: product.client_side_uuid }, 
-                product.client_side_uuid, 
+                product.product_client_side_uuid, 
                 product, 
                 productEntities,
                 product.ui_offset_position_client_side_uuid,
@@ -280,7 +287,7 @@ class WebXREvents {
         // because updating mesh, position, etc. in realtime would
         // hurt the user experience.
         // Mesh updates will, therefore, only take effect after reload.
-        await this.shop.invoke(new UpdateWebXRProductCommand(sceneProduct.Product.uuid, sceneProduct.Product));
+        await this.shop.invoke(new UpdateWebXRProductCommand(sceneProduct.product_client_side_uuid, sceneProduct.Product));
     }
 
     /**
@@ -295,8 +302,8 @@ class WebXREvents {
             return;
         }
 
-        await this.shop.invoke(new RemoveWebXRSelectableCommand(sceneProduct.product_uuid));
-        await this.shop.invoke(new RemoveMeshCommand({ name: sceneProduct.uuid }));
+        await this.shop.invoke(new RemoveWebXRSelectableCommand(sceneProduct.product_client_side_uuid));
+        await this.shop.invoke(new RemoveMeshCommand({ name: sceneProduct.client_side_uuid }));
     }
 
     /**
@@ -310,7 +317,7 @@ class WebXREvents {
         const { product_entity_state_name } = sceneProductEntity;
         
         if (product_entity_state_name === 'AVAILABLE_FOR_PURCHASE') {
-            await this.shop.invoke(new AddWebXRProductEntitiesCommand(sceneProductEntity.product_uuid, [sceneProductEntity]));
+            await this.shop.invoke(new AddWebXRProductEntitiesCommand(sceneProductEntity.product_client_side_uuid, [sceneProductEntity]));
         }
     }
 
@@ -325,11 +332,11 @@ class WebXREvents {
         const { product_entity_state_name } = sceneProductEntity;
         
         if (product_entity_state_name === 'AVAILABLE_FOR_PURCHASE') {
-            await this.shop.invoke(new AddWebXRProductEntitiesCommand(sceneProductEntity.product_uuid, [sceneProductEntity]));
+            await this.shop.invoke(new AddWebXRProductEntitiesCommand(sceneProductEntity.product_client_side_uuid, [sceneProductEntity]));
         } else if (product_entity_state_name === 'RESERVERED_BY_CUSTOMER_CART') {
-            await this.shop.invoke(new RemoveWebXRProductEntitiesCommand(sceneProductEntity.product_uuid, [sceneProductEntity], true));
+            await this.shop.invoke(new RemoveWebXRProductEntitiesCommand(sceneProductEntity.product_client_side_uuid, [sceneProductEntity], true));
         } else {
-           await this.shop.invoke(new RemoveWebXRProductEntitiesCommand(sceneProductEntity.product_uuid, [sceneProductEntity]));
+           await this.shop.invoke(new RemoveWebXRProductEntitiesCommand(sceneProductEntity.product_client_side_uuid, [sceneProductEntity]));
         }
     }
 
@@ -341,6 +348,7 @@ class WebXREvents {
      */
     async onDeleteSceneProductEntity(e) {
         const sceneProductEntity = e.payload;
-        await this.shop.invoke(new RemoveWebXRProductEntitiesCommand(sceneProductEntity.product_uuid, [sceneProductEntity]));
+        console.log('onDeleteSceneProductEntity', sceneProductEntity);
+        await this.shop.invoke(new RemoveWebXRProductEntitiesCommand(sceneProductEntity.product_client_side_uuid, [sceneProductEntity]));
     }
 }

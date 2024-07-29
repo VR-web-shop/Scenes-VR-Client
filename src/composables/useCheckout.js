@@ -51,8 +51,8 @@ export const useCheckout = () => {
         const scenesSDK = useSceneSDK()
         for (const cartProductEntity of CartProductEntities.value) {
 
-            if (duplicatedProductEntities[cartProductEntity.product_uuid]) {
-                duplicatedProductEntities[cartProductEntity.product_uuid].entities.push(cartProductEntity)
+            if (duplicatedProductEntities[cartProductEntity.product_client_side_uuid]) {
+                duplicatedProductEntities[cartProductEntity.product_client_side_uuid].entities.push(cartProductEntity)
             } else {
                 const productEntity = await scenesSDK.sdk.ProductEntity.find( 
                     cartProductEntity.product_entity_client_side_uuid,
@@ -62,9 +62,9 @@ export const useCheckout = () => {
                     productEntity.product_client_side_uuid,
                 )
 
-                cartProductEntity.product_uuid = productEntity.product_uuid
+                cartProductEntity.product_client_side_uuid = productEntity.product_client_side_uuid
     
-                duplicatedProductEntities[productEntity.product_uuid] = {
+                duplicatedProductEntities[productEntity.product_client_side_uuid] = {
                     entities: [productEntity],
                     product: product
                 }

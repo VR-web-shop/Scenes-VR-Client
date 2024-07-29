@@ -36,17 +36,16 @@
                     </template>
 
                     <template #default="{ entities }">
-                        <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
-                            <div v-for="product in entities" :key="product.client_side_uuid"
-                                class="border border-gray-300 rounded-md p-8 bg-gray-300">
+                        <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3 mb-6">
+                            <div v-for="product in entities" :key="product.client_side_uuid">
                                 <div>
-                                    <Product :product="product" />
-
-                                    <div>
-                                        <router-link :to="{ name: 'Product', params: { client_side_uuid: product.client_side_uuid } }"  class="text-white px-5 py-1 rounded-md w-full bg-blue-500 block text-center text-sm">
-                                            View product
-                                        </router-link>
-                                    </div>
+                                    <Product :product="product">
+                                        <div>
+                                            <router-link :to="{ name: 'Product', params: { client_side_uuid: product.client_side_uuid } }"  class="text-white px-5 py-1 rounded-md w-full bg-blue-500 block text-center text-sm">
+                                                View product
+                                            </router-link>
+                                        </div>
+                                    </Product>
                                 </div>
                             </div>
                         </div>

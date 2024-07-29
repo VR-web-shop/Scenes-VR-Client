@@ -1,24 +1,39 @@
 import W3CWebSocket from 'websocket';
 import * as THREE from 'three';
+
 const URL = import.meta.env.VITE_SCENES_WEBSOCKET_URL;
+const DEBUG = import.meta.env.VITE_DEBUG;
 const PROTOCOL = 'echo-protocol';
 const client = new W3CWebSocket.w3cwebsocket(URL, PROTOCOL);
 const eventDispatcher = new THREE.EventDispatcher();
-console.log('URL:', URL);
+
 client.onerror = function() {
-    console.log('Connection Error');
+    if (DEBUG)
+    {
+        console.log('Connection Error');
+    }
 };
 
 client.onopen = function() {
-    console.log('WebSocket Client Connected');
+    if (DEBUG)
+    {        
+        console.log('WebSocket Client Connected');
+    }
 };
 
 client.onclose = function() {
-    console.log('echo-protocol Client Closed');
+    if (DEBUG)
+    {
+        console.log('echo-protocol Client Closed');
+    }
 };
 
 client.onmessage = function(e) {
-    console.log('Received: ' + e.data);
+    if (DEBUG)
+    {
+        console.log('Received: ' + e.data);
+    }
+    
     if (typeof e.data === 'string') {
         const data = JSON.parse(e.data);
         const { type, payload } = data;
@@ -41,7 +56,7 @@ export const useWebsocket = () => {
         if (!Object.values(EVENTS).includes(type)) {
             throw new Error('Invalid event type');
         }
-
+        
         eventDispatcher.addEventListener(type, listener);
     }
 

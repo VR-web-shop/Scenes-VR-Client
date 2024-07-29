@@ -50,6 +50,7 @@ class RemoveWebXRProductEntitiesCommand extends Command {
          * by the shopping cart sdk, we need to update the selectable product
          * with the unknown product entities.
          */
+        console.log('RemoveWebXRProductEntitiesCommand', this.id, this.productEntities)
         await selectHandler.invoke(new UpdateSelectableCommand(this.id, {
             removeProductEntity: this.productEntities,
             releaseReservedProductEntities: this.productEntities,

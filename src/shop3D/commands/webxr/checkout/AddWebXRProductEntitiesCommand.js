@@ -1,6 +1,8 @@
 import Command from "../../../abstractions/commands/Command.js";
 import UpdateSelectableCommand from "../../../plugins/webxr/handlers/select/commands/UpdateSelectableCommand.js";
 
+const DEBUG = import.meta.env.VITE_DEBUG
+
 /**
  * @class AddWebXRProductEntitiesCommand
  * @classdesc Command for adding product entities.
@@ -47,6 +49,8 @@ class AddWebXRProductEntitiesCommand extends Command {
         await selectHandler.invoke(new UpdateSelectableCommand(this.id, {
             addProductEntities: this.productEntities,
         }))
+        
+        if (DEBUG) console.log(`Added product entities for product with id: ${this.id}`)
     }
 }
 

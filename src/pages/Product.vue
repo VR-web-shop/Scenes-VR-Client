@@ -1,5 +1,5 @@
 <template>
-    <div v-if="product" class="mt-28 p-3 flex items-center justify-center">
+    <div v-if="product" class="mt-28 mb-12 p-3 flex items-center justify-center">
         <Product :product="product" />
     </div>
 </template>

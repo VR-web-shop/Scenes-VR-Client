@@ -1,5 +1,5 @@
 <template>
-    <div class="grid grid-cols-3 gap-6 px-10">
+    <div class="grid grid-cols-2 gap-6 px-10">
 
         <div v-for="product in products" :key="product.uuid" class="bg-white text-black p-3 rounded-md">
             <Product :product="product" @addedToCart="onAddedToCart" />
@@ -23,9 +23,10 @@ const reloadProducts = async () => {
     const { count, rows } = await sdk.Product.findAll(1, 1000);
 
     if (count === 0) return
+    const noOfProducts = 2
     const r = []
     const l = rows.length
-    const n = l > 3 ? 3 : l
+    const n = l > noOfProducts ? noOfProducts : l
     const randomStartPoint = Math.floor(Math.random() * (l - n))
     for (let i = 0; i < n; i++) {
         r[i] = rows[randomStartPoint + i]
@@ -37,11 +38,9 @@ const reloadProducts = async () => {
 const onAddedToCart = async (productEntities) => {
     const uniqueProductUUIDs = productEntities.map(pe => pe.product_uuid)
     for (const product of products.value) {
-        if (uniqueProductUUIDs.includes(product.uuid)) {
-            const newProduct = await sdk.api.ProductController.find({ uuid: product.uuid }, {
-                include: ['product_entities']
-            })
-            const index = products.value.findIndex(p => p.uuid === product.uuid)
+        if (uniqueProductUUIDs.includes(product.client_side_uuid)) {
+            const newProduct = await sdk.Product.find(product.client_side_uuid)
+            const index = products.value.findIndex(p => p.client_side_uuid === product.client_side_uuid)
             products.value[index] = newProduct
             break
         }

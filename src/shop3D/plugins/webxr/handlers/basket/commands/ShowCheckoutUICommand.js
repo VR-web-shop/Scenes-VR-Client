@@ -45,7 +45,7 @@ class ShowCheckoutUICommand extends WebXRHandlerCommand {
         options.checkoutUI.clearContentObjects()
         const checkoutProducts = options.checkoutProducts
         for (let i = 0; i < checkoutProducts.length; i++) {
-            console.log(checkoutProducts[i].toContentObject())
+            console.log(checkoutProducts[i])
             options.checkoutUI.addContentObject(checkoutProducts[i].toContentObject())
         }
         

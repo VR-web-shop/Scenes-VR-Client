@@ -1,31 +1,44 @@
 <template>
-    <div class="relative pt-6">
-        <div class="absolute top-1 right-1 text-sm text-gray-600">
-            <div v-if="availableForPurchase.length > 0">
-                Quantity: {{ availableForPurchase.length }}
+    <div class="relative border border-slate-300 p-6 shadow-md">
+        <div class="relative flex justify-center border border-slate-300 p-6 mb-3 shadow-md">
+            <div class="absolute top-0 right-0">
+                <div v-if="availableForPurchase.length > 0" class="px-3 py-1 bg-green-500 text-green-100">
+                    Quantity: {{ availableForPurchase.length }}
+                </div>
+                <div v-else class="px-3 py-1 bg-red-500 text-red-100">
+                    Out of stock
+                </div>
             </div>
-            <div v-else class="text-red-500">
-                Out of stock
+
+            <img :src="product.thumbnail_source" class="w-64" />
+        </div>
+
+        <div class="p-6 mb-3">
+            <div class="text-3xl text-center font-bold mb-3">
+                {{ product.name }}
+            </div>
+
+            <div class="text-sm text-center text-md">
+                {{ product.description }}
             </div>
         </div>
 
-        <img :src="product.thumbnail_source" class="w-64" />
-
-        <div class="text-xl text-center font-bold mb-1">
-            {{ product.name }}
+        <div class="px-3 py-1 bg-slate-100 text-slate-800 mb-3">
+            {{ product.price }} {{ valuta }}
         </div>
 
-        <div class="text-sm text-center border-b border-gray-600 pb-6 mb-6">
-            {{ product.description }}
+        <div class="text-center">
+            <AddToBasket :product="product" @addedToCart="addedToCart" />
         </div>
 
-        <AddToBasket :product="product" @addedToCart="addedToCart" />
+        <slot></slot>
     </div>
 </template>
 
 <script setup>
-import { computed, defineEmits } from 'vue';
+import { computed, defineEmits, onMounted } from 'vue';
 import AddToBasket from '../shopping-basket/AddToBasket.vue';
+import { useProductsSDK } from '../../composables/useProductsSDK';
 const emits = defineEmits(['addedToCart']);
 const props = defineProps({
     product: {
@@ -33,6 +46,12 @@ const props = defineProps({
         required: true
     }
 })
+const productsCtrl = useProductsSDK()
+onMounted(async () => {
+    await productsCtrl.start()
+})
+const valuta = computed(() => productsCtrl.valuta.value?.short)
+
 const addedToCart = (productEntities) => {
     emits('addedToCart', productEntities);
 }

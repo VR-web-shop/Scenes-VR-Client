@@ -86,12 +86,13 @@ export function useShoppingCartSDK() {
         
         const scenesSDK = useSceneSDK()
         for (const cartProductEntity of _cartProductEntities.value) {
-            const productEntity = await scenesSDK.sdk.api.ProductEntityController.find({ 
-                uuid: cartProductEntity.product_entity_client_side_uuid,
-            })
+            
+            const productEntity = await scenesSDK.sdk.ProductEntity.find( 
+                cartProductEntity.product_entity_client_side_uuid,
+            )
             
             await shop.invoke(new AddWebXRReservedProductEntitiesCommand(
-                productEntity.product_uuid, [toRaw(productEntity)]
+                productEntity.product_client_side_uuid, [toRaw(productEntity)]
             ))
         }
     }
@@ -162,8 +163,10 @@ export function useShoppingCartSDK() {
         const cartProductEntities = _cartProductEntities.value
         
         for (const productEntity of productEntitiesInUse) {
+            console.log('productEntity', productEntity, cartProductEntities)
             const entity = cartProductEntities.find(entity => {
                 return entity.product_entity_client_side_uuid === productEntity.uuid
+                || entity.product_entity_client_side_uuid === productEntity.client_side_uuid
             })
             
             await sdk.CartProductEntity.remove({
